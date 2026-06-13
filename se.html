@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>癲癇重積狀態 · 治療決策 — BrainTaiwan ER</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0d1117;
+  --surf:     #161b22;
+  --surf2:    #21262d;
+  --border:   #30363d;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --red:      #f85149;
+  --red-dim:  #3d1515;
+  --blue:     #58a6ff;
+  --blue-dim: #0d2137;
+  --green:    #3fb950;
+  --grn-dim:  #0d2e0d;
+  --ylw:      #d29922;
+  --ylw-dim:  #2e2000;
+  --ora:      #ff7b2e;
+  --pur:      #bc8cff;
+  --pur-dim:  #1c1030;
+}
+
+body {
+  font-family: 'Segoe UI','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(135deg,#1a0505 0%,#2d0a0a 55%,#420f0f 100%);
+  border-bottom: 1px solid #5c1c1c; padding: 18px 24px;
+}
+.header-inner { max-width: 800px; margin: 0 auto; }
+.brand { font-size: 10pt; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+.tool-title { font-size: 22pt; font-weight: 700; color: white; line-height: 1.2; }
+.tool-sub { font-size: 11pt; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+.topnav { background: var(--surf); border-bottom: 1px solid var(--border); padding: 10px 24px; }
+.topnav-inner { max-width: 800px; margin: 0 auto; display: flex; gap: 6px; align-items: center; }
+.topnav a { color: var(--muted); text-decoration: none; font-size: 10.5pt; padding: 5px 12px; border-radius: 6px; transition: background 0.15s; }
+.topnav a:hover { background: var(--surf2); color: var(--text); }
+.topnav .cur { color: var(--green); font-weight: 600; }
+
+main { max-width: 800px; margin: 0 auto; padding: 28px 20px 72px; }
+
+/* ── PHASE INDICATOR ── */
+.phase-bar {
+  display: flex; gap: 0; border-radius: 8px; overflow: hidden;
+  margin-bottom: 22px; border: 1px solid var(--border);
+}
+.phase-seg {
+  flex: 1; padding: 10px 6px; text-align: center;
+  font-size: 10pt; color: var(--muted); background: var(--surf);
+  border-right: 1px solid var(--border); line-height: 1.3;
+}
+.phase-seg:last-child { border-right: none; }
+.phase-seg.act { color: white; font-weight: 700; }
+.ph-0.act { background: #1b4d1b; color: var(--green); }
+.ph-1.act { background: #1a3d00; color: #8bc34a; }
+.ph-2.act { background: #4a2e00; color: var(--ylw); }
+.ph-3.act { background: #4a1500; color: var(--red); }
+.ph-4.act { background: #2a0a40; color: var(--pur); }
+.phase-seg .ph-time { font-size: 9pt; opacity: 0.75; }
+
+/* ── BREADCRUMB ── */
+.crumb { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.crumb-item {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 12px; font-size: 10pt;
+  display: flex; gap: 6px; align-items: center;
+}
+.crumb-lbl { color: var(--muted); }
+.crumb-val { color: var(--text); font-weight: 600; }
+
+/* ── STEP CARD ── */
+.step-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 12px; padding: 26px 28px 22px;
+}
+.step-meta { display: flex; align-items: center; gap: 10px; font-size: 10pt; color: var(--muted); margin-bottom: 10px; }
+.step-dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--green); color: #0d1117; font-size: 10pt; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-q { font-size: 17pt; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 8px; }
+.step-hint { font-size: 11pt; color: var(--muted); line-height: 1.55; margin-bottom: 20px; }
+
+/* ── DRUG INLINE BOX ── */
+.dose-inline {
+  background: rgba(0,0,0,0.35); border-radius: 8px; padding: 14px 16px; margin: 12px 0;
+  font-size: 11pt; color: var(--text); line-height: 1.6;
+}
+.dose-inline strong { color: var(--green); }
+
+/* ── OPTIONS ── */
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.opt-btn {
+  background: var(--surf2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px 20px;
+  text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.opt-btn:hover { border-color: var(--green); background: #0e1a10; }
+.opt-main { font-size: 14pt; font-weight: 600; color: var(--text); }
+.opt-sub  { font-size: 10.5pt; color: var(--muted); }
+
+/* ── DRUG CHOICE BUTTONS ── */
+.drug-opts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.drug-opt {
+  background: var(--surf2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; cursor: pointer;
+  transition: border-color 0.15s; text-align: left;
+}
+.drug-opt:hover { border-color: var(--blue); }
+.drug-opt-name { font-size: 13pt; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+.drug-opt-dose { font-size: 15pt; font-weight: 700; color: white; }
+.drug-opt-note { font-size: 10.5pt; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+
+/* ── NAV BUTTONS ── */
+.nav-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-btn {
+  padding: 10px 18px; background: var(--surf2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--muted); cursor: pointer; font-size: 11pt; transition: all 0.15s;
+}
+.nav-btn:hover { border-color: var(--muted); color: var(--text); }
+
+/* ── RESULT CARD ── */
+.res-card { border-radius: 12px; padding: 28px; }
+.res-card.green  { background: var(--grn-dim); border: 1px solid #1a5c1a; }
+.res-card.blue   { background: var(--blue-dim); border: 1px solid #1a3d60; }
+.res-card.yellow { background: var(--ylw-dim);  border: 1px solid #4a3800; }
+.res-card.red    { background: var(--red-dim);  border: 1px solid #5a2020; }
+.res-card.purple { background: var(--pur-dim);  border: 1px solid #3a1860; }
+.res-card.gray   { background: var(--surf);     border: 1px solid var(--border); }
+
+.res-badge {
+  display: inline-block; font-size: 10pt; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+}
+.green .res-badge  { background: #174d17; color: var(--green); }
+.blue  .res-badge  { background: #0a2845; color: var(--blue); }
+.yellow .res-badge { background: #3a2800; color: var(--ylw); }
+.red   .res-badge  { background: #4a1515; color: var(--red); }
+.purple .res-badge { background: #200840; color: var(--pur); }
+.gray  .res-badge  { background: var(--surf2); color: var(--muted); }
+
+.res-title { font-size: 19pt; font-weight: 700; color: white; margin-bottom: 18px; line-height: 1.25; }
+
+.drug-box {
+  background: rgba(0,0,0,0.35); border-radius: 10px; padding: 16px 18px; margin: 12px 0;
+}
+.drug-name { font-size: 12pt; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.drug-name.alt { color: var(--blue); }
+.drug-name.red { color: var(--red); }
+.drug-dose { font-size: 17pt; font-weight: 700; color: white; }
+.drug-detail { font-size: 11pt; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+.act-list { list-style: none; margin: 10px 0; }
+.act-list li {
+  font-size: 12pt; color: var(--text); padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; gap: 10px; align-items: flex-start; line-height: 1.5;
+}
+.act-list li:last-child { border-bottom: none; }
+
+.warn-inline {
+  background: rgba(210,153,34,0.15); border: 1px solid rgba(210,153,34,0.3);
+  border-radius: 6px; padding: 12px 14px; font-size: 11.5pt; color: var(--ylw);
+  margin: 12px 0; line-height: 1.5;
+}
+.ref-box {
+  margin-top: 18px; padding: 12px 14px;
+  background: rgba(0,0,0,0.3); border-radius: 6px;
+  font-size: 10pt; color: var(--muted); line-height: 1.5;
+}
+
+footer {
+  background: var(--surf); border-top: 1px solid var(--border);
+  text-align: center; padding: 20px 24px;
+  font-size: 10pt; color: var(--muted); margin-top: 40px; line-height: 1.7;
+}
+footer a { color: var(--muted); text-decoration: none; }
+
+@media(max-width:600px) {
+  .step-q { font-size: 15pt; }
+  .res-title { font-size: 16pt; }
+  .step-card, .res-card { padding: 20px 16px; }
+  .phase-bar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">BrainTaiwan · ER</div>
+    <div class="tool-title">癲癇重積狀態</div>
+    <div class="tool-sub">Status Epilepticus · 治療決策輔助 · NCS / AES Guidelines</div>
+  </div>
+</header>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="/">首頁</a>
+    <span style="color:var(--border)">›</span>
+    <a href="se.html" class="cur">癲癇重積狀態</a>
+  </div>
+</nav>
+
+<main>
+  <div id="app"></div>
+</main>
+
+<footer>
+  <strong>⚠️ 免責聲明</strong>：本工具為臨床決策輔助，不取代個別病人臨床判斷。所有治療決定須依醫師評估執行。<br>
+  資料來源：Brophy GM et al. <em>Neurocrit Care.</em> 2012 ／ Kapur J et al. (ESETT) <em>NEJM</em> 2019 ／ Silbergleit R et al. (RAMPART) <em>NEJM</em> 2012<br>
+  © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a> ·
+  <a href="https://md.braintaiwan.com/se01.html">文獻導讀版</a>
+</footer>
+
+<script>
+// ── PHASE BAR LABELS ──
+const PHASES = [
+  { label: '穩定期', time: '0–5 min', cls: 'ph-0' },
+  { label: '第一線', time: '5–20 min', cls: 'ph-1' },
+  { label: '第二線', time: '20–40 min', cls: 'ph-2' },
+  { label: '難治性 SE', time: '>40 min', cls: 'ph-3' },
+  { label: '超難治', time: '>24 h', cls: 'ph-4' },
+];
+
+// ── STEPS ──
+const STEPS = {
+
+  seizure_type: {
+    num: 1, title: 'STEP 1', phase: 0,
+    q: '發作類型確認',
+    hint: '發作中或剛結束？選擇最符合的臨床情況',
+    opts: [
+      { main: '驚厥性發作（全身抽搐）≥ 5 分鐘', sub: '持續或間歇發作但意識未恢復', val: 'cse' },
+      { main: '疑似非驚厥性 SE（NCSE）', sub: '意識改變 / 凝視 / 細微動作，無明顯抽搐', val: 'ncse' },
+      { main: '發作 < 5 分鐘，仍持續中', sub: '開始計時，備妥 BZD', val: 'pre_se' },
+    ],
+    next: { cse: 'stabilize', ncse: 'result_ncse_eeg', pre_se: 'result_observe' }
+  },
+
+  stabilize: {
+    num: 2, title: 'STEP 2', phase: 0,
+    q: '穩定與同步措施',
+    hint: '以下應同步進行，完成後進入 BZD 給藥',
+    chk: [
+      '側臥姿勢，確保呼吸道通暢',
+      '血氧監測，O₂ 維持 SpO₂ > 94%',
+      '心電圖監測',
+      '床旁血糖（低血糖 → 立即給 D50W 50 mL；給糖前先給 Thiamine 100 mg IV 若懷疑酒精相關）',
+      '建立靜脈通路（同時抽血：電解質、BUN/Cr、CBC、AED 血中濃度、毒物篩檢）',
+      '記錄發作開始時間 / LKWT',
+    ],
+    opts: [
+      { main: '已完成，進入 BZD 給藥', val: 'iv_check' },
+    ],
+    next: { iv_check: 'iv_check' }
+  },
+
+  iv_check: {
+    num: 3, title: 'STEP 3', phase: 1,
+    q: '靜脈通路狀態？',
+    hint: '有無 IV access 決定 BZD 給藥途徑',
+    opts: [
+      { main: '有靜脈通路（IV）', val: 'bzd_iv' },
+      { main: '無靜脈通路', sub: '現場建立困難或需時間', val: 'bzd_im' },
+    ],
+    next: { bzd_iv: 'bzd_iv', bzd_im: 'bzd_im' }
+  },
+
+  bzd_iv: {
+    num: 4, title: 'STEP 4', phase: 1,
+    q: '第一線 BZD — 靜脈給藥',
+    hint: '給藥後等候 5 分鐘評估療效',
+    isDrug: true,
+    drugs: [
+      {
+        name: '▶ Lorazepam（首選，有 IV）',
+        dose: '0.1 mg/kg IV（成人 4 mg）',
+        note: '給藥速度 2 mg/min ｜ 持效 12–24 h ｜ 5 分鐘後未停止可重複一次',
+        val: 'bzd1_result'
+      },
+      {
+        name: '▶ Diazepam（備用）',
+        dose: '0.15–0.2 mg/kg IV（成人 10 mg）',
+        note: '給藥速度 5 mg/min ｜ 效果短（30–60 min），需後續 AED ｜ 可重複一次',
+        val: 'bzd1_result'
+      },
+    ],
+    next: { bzd1_result: 'bzd1_result' }
+  },
+
+  bzd_im: {
+    num: 4, title: 'STEP 4', phase: 1,
+    q: '第一線 BZD — 非靜脈給藥',
+    hint: '無 IV 時優先選 IM midazolam（RAMPART 試驗：優於 IV lorazepam，因給藥更快）',
+    isDrug: true,
+    drugs: [
+      {
+        name: '▶ Midazolam IM（首選，無 IV）',
+        dose: '10 mg IM（體重 > 40 kg）/ 5 mg IM（13–40 kg）',
+        note: '三角肌或大腿外側 ｜ 起效 3–5 min ｜ 同時繼續建立 IV',
+        val: 'bzd1_result'
+      },
+      {
+        name: '▶ Midazolam 鼻腔給藥（IN）',
+        dose: '0.2 mg/kg IN（各鼻孔各半）',
+        note: '兒童或無法配合 IM 時 ｜ 使用 5 mg/mL 濃度',
+        val: 'bzd1_result'
+      },
+    ],
+    next: { bzd1_result: 'bzd1_result' }
+  },
+
+  bzd1_result: {
+    num: 5, title: 'STEP 5', phase: 1,
+    q: '給藥 5 分鐘後評估',
+    hint: '觀察發作是否停止，同時備妥第二劑 BZD',
+    opts: [
+      { main: '發作停止', sub: '意識逐漸恢復，無持續抽搐', val: 'result_bzd_success' },
+      { main: '發作未停止', sub: '繼續抽搐或 EEG 仍有放電', val: 'bzd2' },
+    ],
+    next: { result_bzd_success: 'result_bzd_success', bzd2: 'bzd2' }
+  },
+
+  bzd2: {
+    num: 6, title: 'STEP 6', phase: 1,
+    q: '重複第二劑 BZD',
+    hint: '與第一劑相同藥物和劑量。同時開始準備第二線 AED——不要等待結果才抽藥。',
+    isDrug: true,
+    drugs: [
+      {
+        name: '▶ 重複 BZD（同第一劑藥物）',
+        dose: '同前劑量再給一次',
+        note: 'BZD 最多給兩次（呼吸抑制風險）｜ 給完即準備第二線 AED',
+        val: 'bzd2_result'
+      },
+    ],
+    next: { bzd2_result: 'bzd2_result' }
+  },
+
+  bzd2_result: {
+    num: 7, title: 'STEP 7', phase: 1,
+    q: '第二劑 BZD 後評估',
+    opts: [
+      { main: '發作停止', val: 'result_bzd_success' },
+      { main: '發作未停止', sub: '確立期 SE（established SE）——啟動第二線 AED', val: 'aed_choice' },
+    ],
+    next: { result_bzd_success: 'result_bzd_success', aed_choice: 'aed_choice' }
+  },
+
+  aed_choice: {
+    num: 8, title: 'STEP 8', phase: 2,
+    q: '第二線 AED 選擇',
+    hint: 'ESETT 試驗（NEJM 2019）：三種藥物療效相仿（各約 47%）。依禁忌症選擇。',
+    isDrug: true,
+    drugs: [
+      {
+        name: '▶ Levetiracetam — 多數情境首選',
+        dose: '60 mg/kg IV（最大 4,500 mg），15 分鐘滴完',
+        note: '無肝代謝、無重要交互作用 ｜ 腎功能不全需調整 ｜ 適合多重用藥患者',
+        val: 'aed_result'
+      },
+      {
+        name: '▶ Valproate — 廣泛性癲癇，非孕婦',
+        dose: '40 mg/kg IV（最大 3,000 mg），10 分鐘滴完',
+        note: '禁用：孕婦、粒線體病變、嚴重肝病 ｜ 廣泛性發作型 SE 效果佳',
+        val: 'aed_result'
+      },
+      {
+        name: '▶ Fosphenytoin — 局灶性 SE',
+        dose: '20 mg PE/kg IV（最大 1,500 mg PE），最快 150 mg PE/min',
+        note: '需持續心律監測（QTc 延長、低血壓）｜ 禁用：AVB、竇性心搏過緩、amiodarone 使用中',
+        val: 'aed_result'
+      },
+    ],
+    next: { aed_result: 'aed_result' }
+  },
+
+  aed_result: {
+    num: 9, title: 'STEP 9', phase: 2,
+    q: '第二線 AED 後評估（30–60 分鐘）',
+    opts: [
+      { main: '發作停止', sub: '意識改善，EEG 無持續放電', val: 'result_aed_success' },
+      { main: '發作未停止', sub: '難治性 SE（refractory SE）——升級治療', val: 'result_rse' },
+    ],
+    next: { result_aed_success: 'result_aed_success', result_rse: 'result_rse' }
+  },
+};
+
+// ── RESULTS ──
+const RESULTS = {
+
+  result_observe: {
+    type: 'green', badge: '⏱️ 觀察中',
+    title: '< 5 分鐘——備妥 BZD，繼續觀察',
+    phase: 0,
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">大多數發作在 2 分鐘內自行停止。保持觀察，若超過 5 分鐘即啟動治療。</p>
+      <ul class="act-list">
+        <li><span>⏱️</span>計時，記錄發作開始時間</li>
+        <li><span>💊</span>備妥 BZD：Lorazepam 4mg（或 Midazolam 10mg IM 備用）</li>
+        <li><span>🩺</span>確保 IV access，監測血氧</li>
+        <li><span>📋</span>超過 5 分鐘 → 立即給 BZD，重新開始此決策流程</li>
+      </ul>`
+  },
+
+  result_ncse_eeg: {
+    type: 'yellow', badge: '⚠️ 疑似 NCSE',
+    title: '疑似非驚厥性 SE——緊急 EEG',
+    phase: 0,
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">NCSE 缺乏外顯抽搐，須以 EEG 確診。在等待 EEG 期間同步穩定病人。</p>
+      <ul class="act-list">
+        <li><span>🔍</span><strong>緊急 EEG</strong>：目標在 1 小時內完成；疑似 NCSE 應安排連續 EEG（cEEG）</li>
+        <li><span>💊</span>可考慮給予一劑 BZD（Lorazepam 1–2 mg IV）作為診斷性治療——EEG 改善且臨床改善即可確診</li>
+        <li><span>🧪</span>排除代謝性腦病（血糖、電解質、血氨）</li>
+        <li><span>🧠</span>若高度懷疑腦炎（發燒 + 意識改變），盡早給 Acyclovir + 廣效抗生素</li>
+      </ul>
+      <div class="warn-inline">⚠️ ICU 中 8–48% 不明原因昏迷有 NCSE。NCSE 確認後按 SE 流程治療。</div>
+      <div class="ref-box">薩爾茨堡共識標準；NCS cEEG 指引 2021</div>`
+  },
+
+  result_bzd_success: {
+    type: 'green', badge: '✅ BZD 有效',
+    title: 'BZD 成功終止發作',
+    phase: 1,
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">發作停止，進入監測與後續處置階段。</p>
+      <ul class="act-list">
+        <li><span>📊</span>持續監測血氧、血壓、心律（BZD 呼吸抑制可能延遲出現）</li>
+        <li><span>🧠</span>若意識未在 30 分鐘內恢復 → 安排 EEG 排除 subclinical SE</li>
+        <li><span>💊</span>啟動長效 AED（口服 levetiracetam 或 valproate）作為維持治療</li>
+        <li><span>🔍</span>完整病因評估：影像、腦波、腰椎穿刺（若適應症）</li>
+        <li><span>📋</span>記錄發作時間、用藥、反應，轉神經科評估</li>
+      </ul>
+      <div class="ref-box">RAMPART trial（Silbergleit 2012, NEJM）</div>`
+  },
+
+  result_aed_success: {
+    type: 'blue', badge: '✅ 第二線 AED 有效',
+    title: '第二線 AED 成功終止發作',
+    phase: 2,
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">確立期 SE 控制，進入 ICU 監測與後續評估。</p>
+      <ul class="act-list">
+        <li><span>🧠</span>安排連續 EEG（cEEG）監測 24 小時——排除 subclinical SE</li>
+        <li><span>🏥</span>轉入 ICU 或神經科監護病房</li>
+        <li><span>💊</span>繼續已給藥的 AED 作為維持治療</li>
+        <li><span>🔍</span>完整病因評估（MRI、腰椎穿刺、自體免疫抗體組合）</li>
+        <li><span>📋</span>若病因為自體免疫性腦炎，考慮早期免疫治療</li>
+      </ul>
+      <div class="ref-box">ESETT trial（Kapur 2019, NEJM）</div>`
+  },
+
+  result_rse: {
+    type: 'red', badge: '🔴 難治性 SE（RSE）',
+    title: '難治性 SE——ICU 麻醉藥物',
+    phase: 3,
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">BZD + 第二線 AED 均失效。立即準備氣管插管、轉入 ICU，啟動麻醉藥物點滴。</p>
+
+      <ul class="act-list" style="margin-bottom:14px;">
+        <li><span>⚡</span>氣管插管，轉入 ICU</li>
+        <li><span>📊</span>安排連續 EEG（cEEG）——依腦波調整麻醉深度</li>
+        <li><span>🔍</span>緊急病因評估：MRI、腰椎穿刺、自體免疫抗體</li>
+      </ul>
+
+      <div class="drug-box">
+        <div class="drug-name">▶ Midazolam 點滴（首選）</div>
+        <div class="drug-dose">負荷 0.2 mg/kg IV，維持 0.05–2 mg/kg/hr</div>
+        <div class="drug-detail">依 EEG 調整劑量 ｜ 短效、可快速調整 ｜ 長時間高劑量注意耐藥性</div>
+      </div>
+
+      <div class="drug-box">
+        <div class="drug-name alt">▶ Propofol 點滴（替代）</div>
+        <div class="drug-dose">負荷 1–2 mg/kg IV，維持 1–5 mg/kg/hr</div>
+        <div class="drug-detail">PRIS 風險：&gt;4 mg/kg/hr 或 &gt;48h 使用需監測 CK、TG、血氣 ｜ 兒童禁用</div>
+      </div>
+
+      <div class="drug-box">
+        <div class="drug-name red">▶ Pentobarbital（升級選項）</div>
+        <div class="drug-dose">負荷 5 mg/kg IV（1 mg/kg/min），維持 1–10 mg/kg/hr</div>
+        <div class="drug-detail">強力 EEG 抑制，達 burst suppression ｜ 低血壓（常需升壓藥）｜ 停藥恢復慢</div>
+      </div>
+
+      <div class="warn-inline">⚠️ 若 &gt;24h 麻醉仍無效 → 超難治性 SE（SRSE）：考慮 Ketamine、生酮飲食、低溫、<strong>免疫治療（類固醇 + IVIG）</strong>。查自體免疫抗體，不等結果即可經驗性免疫治療。</div>
+
+      <div class="ref-box">Brophy GM et al. NCS Guidelines. <em>Neurocrit Care.</em> 2012 ／ Ferlisi & Shorvon. <em>Epilepsia.</em> 2012</div>`
+  },
+};
+
+// ── STATE ──
+let path = [];
+let cur  = 'seizure_type';
+
+const STEP_LABELS = {
+  seizure_type: '發作類型', stabilize: '穩定措施', iv_check: 'IV 狀態',
+  bzd_iv: 'BZD（IV）', bzd_im: 'BZD（IM）', bzd1_result: '第一劑評估',
+  bzd2: '第二劑 BZD', bzd2_result: '第二劑評估',
+  aed_choice: '第二線 AED', aed_result: 'AED 評估',
+};
+
+function getOptLabel(sid, val) {
+  const s = STEPS[sid]; if (!s) return val;
+  if (s.isDrug) {
+    const d = s.drugs.find(x => x.val === val);
+    return d ? d.name.replace('▶ ', '').split('（')[0] : val;
+  }
+  const o = s.opts && s.opts.find(x => x.val === val);
+  return o ? o.main : val;
+}
+
+function getPhase(stepId) {
+  if (stepId.startsWith('result_')) {
+    const r = RESULTS[stepId]; return r ? (r.phase ?? 0) : 0;
+  }
+  const s = STEPS[stepId]; return s ? (s.phase ?? 0) : 0;
+}
+
+function renderPhaseBar(activePhase) {
+  return '<div class="phase-bar">' +
+    PHASES.map((p, i) =>
+      `<div class="phase-seg ${p.cls}${i === activePhase ? ' act' : ''}">
+        ${p.label}<br><span class="ph-time">${p.time}</span>
+      </div>`
+    ).join('') +
+  '</div>';
+}
+
+function renderCrumbs() {
+  if (!path.length) return '';
+  return '<div class="crumb">' +
+    path.map(p =>
+      `<div class="crumb-item">
+        <span class="crumb-lbl">${STEP_LABELS[p.s] || p.s}</span>
+        <span style="color:#555;margin:0 3px">›</span>
+        <span class="crumb-val">${getOptLabel(p.s, p.v)}</span>
+      </div>`
+    ).join('') +
+  '</div>';
+}
+
+function renderNavBtns() {
+  if (!path.length) return '';
+  return `<div class="nav-btns" style="margin-top:20px;">
+    <button class="nav-btn" onclick="goBack()">← 上一步</button>
+    <button class="nav-btn" onclick="reset()">↺ 重新開始</button>
+  </div>`;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (cur.startsWith('result_')) { renderResult(app); return; }
+
+  const step = STEPS[cur];
+  if (!step) { app.innerHTML = `<p style="color:red">Step not found: ${cur}</p>`; return; }
+
+  let h = renderPhaseBar(step.phase ?? 0);
+  h += renderCrumbs();
+  h += `<div class="step-card">`;
+  h += `<div class="step-meta"><div class="step-dot">${step.num}</div><span>${step.title}</span></div>`;
+  h += `<div class="step-q">${step.q}</div>`;
+  if (step.hint) h += `<div class="step-hint">${step.hint}</div>`;
+
+  if (step.chk) {
+    h += `<div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+      <ul style="list-style:none;">`;
+    step.chk.forEach(c => {
+      h += `<li style="font-size:11.5pt;color:#e6edf3;padding:5px 0 5px 22px;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;">
+        <span style="position:absolute;left:0;">☐</span>${c}</li>`;
+    });
+    h += `</ul></div>`;
+  }
+
+  if (step.isDrug) {
+    h += `<div class="drug-opts">`;
+    step.drugs.forEach(d => {
+      h += `<button class="drug-opt" onclick="choose('${cur}','${d.val}')">
+        <div class="drug-opt-name">${d.name}</div>
+        <div class="drug-opt-dose">${d.dose}</div>
+        <div class="drug-opt-note">${d.note}</div>
+      </button>`;
+    });
+    h += `</div>`;
+  } else if (step.opts) {
+    h += `<div class="options">`;
+    step.opts.forEach(o => {
+      h += `<button class="opt-btn" onclick="choose('${cur}','${o.val}')">
+        <span class="opt-main">${o.main}</span>
+        ${o.sub ? `<span class="opt-sub">${o.sub}</span>` : ''}
+      </button>`;
+    });
+    h += `</div>`;
+  }
+
+  h += renderNavBtns();
+  h += `</div>`;
+  app.innerHTML = h;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderResult(app) {
+  const r = RESULTS[cur];
+  if (!r) { app.innerHTML = `<p style="color:red">Result not found: ${cur}</p>`; return; }
+
+  let h = renderPhaseBar(r.phase ?? 0);
+  h += renderCrumbs();
+  h += `<div class="res-card ${r.type}">`;
+  h += `<div class="res-badge">${r.badge}</div>`;
+  h += `<div class="res-title">${r.title}</div>`;
+  h += r.html;
+  h += `</div>`;
+  h += renderNavBtns();
+  app.innerHTML = h;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function choose(stepId, val) {
+  path.push({ s: stepId, v: val });
+  const step = STEPS[stepId];
+  cur = step.next[val];
+  render();
+}
+
+function goBack() {
+  if (!path.length) return;
+  const last = path.pop();
+  cur = last.s;
+  render();
+}
+
+function reset() {
+  path = []; cur = 'seizure_type'; render();
+}
+
+render();
+</script>
+</body>
+</html>
