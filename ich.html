@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>急性顱內出血管理 · 治療決策 — BrainTaiwan ER</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0d1117;
+  --surf:     #161b22;
+  --surf2:    #21262d;
+  --border:   #30363d;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --red:      #f85149;
+  --red-dim:  #3d1515;
+  --blue:     #58a6ff;
+  --blue-dim: #0d2137;
+  --green:    #3fb950;
+  --grn-dim:  #0d2e0d;
+  --ylw:      #d29922;
+  --ylw-dim:  #2e2000;
+  --ora:      #ff7b2e;
+  --pur:      #bc8cff;
+  --pur-dim:  #1c1030;
+}
+
+body {
+  font-family: 'Segoe UI','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(135deg,#1a0505 0%,#3a0a0a 55%,#5a0f0f 100%);
+  border-bottom: 1px solid #6c1c1c; padding: 18px 24px;
+}
+.header-inner { max-width: 800px; margin: 0 auto; }
+.brand { font-size: 10pt; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+.tool-title { font-size: 22pt; font-weight: 700; color: white; line-height: 1.2; }
+.tool-sub { font-size: 11pt; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+.topnav { background: var(--surf); border-bottom: 1px solid var(--border); padding: 10px 24px; }
+.topnav-inner { max-width: 800px; margin: 0 auto; display: flex; gap: 6px; align-items: center; }
+.topnav a { color: var(--muted); text-decoration: none; font-size: 10.5pt; padding: 5px 12px; border-radius: 6px; transition: background 0.15s; }
+.topnav a:hover { background: var(--surf2); color: var(--text); }
+.topnav .cur { color: var(--red); font-weight: 600; }
+
+main { max-width: 800px; margin: 0 auto; padding: 28px 20px 72px; }
+
+/* ── PHASE INDICATOR ── */
+.phase-bar {
+  display: flex; gap: 0; border-radius: 8px; overflow: hidden;
+  margin-bottom: 22px; border: 1px solid var(--border);
+}
+.phase-seg {
+  flex: 1; padding: 10px 6px; text-align: center;
+  font-size: 10pt; color: var(--muted); background: var(--surf);
+  border-right: 1px solid var(--border); line-height: 1.3;
+}
+.phase-seg:last-child { border-right: none; }
+.phase-seg.act { color: white; font-weight: 700; }
+.ph-0.act { background: #1b3d5c; color: var(--blue); }
+.ph-1.act { background: #4a1500; color: var(--ora); }
+.ph-2.act { background: #4a2e00; color: var(--ylw); }
+.ph-3.act { background: #2a0a40; color: var(--pur); }
+.ph-4.act { background: #4a1515; color: var(--red); }
+
+/* ── BREADCRUMB ── */
+.crumb { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.crumb-item {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 12px; font-size: 10pt;
+  display: flex; gap: 6px; align-items: center;
+}
+.crumb-lbl { color: var(--muted); }
+.crumb-val { color: var(--text); font-weight: 600; }
+
+/* ── STEP CARD ── */
+.step-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 12px; padding: 26px 28px 22px;
+}
+.step-meta { display: flex; align-items: center; gap: 10px; font-size: 10pt; color: var(--muted); margin-bottom: 10px; }
+.step-dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--red); color: #0d1117; font-size: 10pt; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-q { font-size: 17pt; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 8px; }
+.step-hint { font-size: 11pt; color: var(--muted); line-height: 1.55; margin-bottom: 20px; }
+
+/* ── OPTIONS ── */
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.opt-btn {
+  background: var(--surf2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px 20px;
+  text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.opt-btn:hover { border-color: var(--red); background: #1a0e0e; }
+.opt-main { font-size: 14pt; font-weight: 600; color: var(--text); }
+.opt-sub  { font-size: 10.5pt; color: var(--muted); }
+
+/* ── DRUG CHOICE BUTTONS ── */
+.drug-opts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.drug-opt {
+  background: var(--surf2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; cursor: pointer;
+  transition: border-color 0.15s; text-align: left;
+}
+.drug-opt:hover { border-color: var(--blue); }
+.drug-opt-name { font-size: 13pt; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+.drug-opt-dose { font-size: 15pt; font-weight: 700; color: white; }
+.drug-opt-note { font-size: 10.5pt; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+
+/* ── NAV BUTTONS ── */
+.nav-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-btn {
+  padding: 10px 18px; background: var(--surf2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--muted); cursor: pointer; font-size: 11pt; transition: all 0.15s;
+}
+.nav-btn:hover { border-color: var(--muted); color: var(--text); }
+.cont-btn {
+  padding: 12px 22px; background: var(--red); border: none;
+  border-radius: 8px; color: #0d1117; cursor: pointer; font-size: 12pt; font-weight: 700;
+  transition: opacity 0.15s; margin-top: 4px;
+}
+.cont-btn:hover { opacity: 0.85; }
+
+/* ── RESULT CARD ── */
+.res-card { border-radius: 12px; padding: 28px; }
+.res-card.green  { background: var(--grn-dim); border: 1px solid #1a5c1a; }
+.res-card.blue   { background: var(--blue-dim); border: 1px solid #1a3d60; }
+.res-card.yellow { background: var(--ylw-dim);  border: 1px solid #4a3800; }
+.res-card.red    { background: var(--red-dim);  border: 1px solid #5a2020; }
+.res-card.purple { background: var(--pur-dim);  border: 1px solid #3a1860; }
+.res-card.gray   { background: var(--surf);     border: 1px solid var(--border); }
+
+.res-badge {
+  display: inline-block; font-size: 10pt; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+}
+.green .res-badge  { background: #174d17; color: var(--green); }
+.blue  .res-badge  { background: #0a2845; color: var(--blue); }
+.yellow .res-badge { background: #3a2800; color: var(--ylw); }
+.red   .res-badge  { background: #4a1515; color: var(--red); }
+.purple .res-badge { background: #200840; color: var(--pur); }
+.gray  .res-badge  { background: var(--surf2); color: var(--muted); }
+
+.res-title { font-size: 19pt; font-weight: 700; color: white; margin-bottom: 18px; line-height: 1.25; }
+
+.drug-box {
+  background: rgba(0,0,0,0.35); border-radius: 10px; padding: 16px 18px; margin: 12px 0;
+}
+.drug-name { font-size: 12pt; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.drug-name.alt { color: var(--blue); }
+.drug-name.red { color: var(--red); }
+.drug-dose { font-size: 17pt; font-weight: 700; color: white; }
+.drug-detail { font-size: 11pt; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+.act-list { list-style: none; margin: 10px 0; }
+.act-list li {
+  font-size: 12pt; color: var(--text); padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; gap: 10px; align-items: flex-start; line-height: 1.5;
+}
+.act-list li:last-child { border-bottom: none; }
+
+.warn-inline {
+  background: rgba(248,81,73,0.12); border: 1px solid rgba(248,81,73,0.3);
+  border-radius: 6px; padding: 12px 14px; font-size: 11.5pt; color: #ff8a82;
+  margin: 12px 0; line-height: 1.5;
+}
+.bundle-box {
+  background: rgba(88,166,255,0.07); border: 1px solid rgba(88,166,255,0.22);
+  border-radius: 8px; padding: 14px 18px; margin: 16px 0 4px;
+}
+.bundle-box h4 { font-size: 12pt; color: var(--blue); margin-bottom: 8px; }
+.ref-box {
+  margin-top: 18px; padding: 12px 14px;
+  background: rgba(0,0,0,0.3); border-radius: 6px;
+  font-size: 10pt; color: var(--muted); line-height: 1.5;
+}
+
+footer {
+  background: var(--surf); border-top: 1px solid var(--border);
+  text-align: center; padding: 20px 24px;
+  font-size: 10pt; color: var(--muted); margin-top: 40px; line-height: 1.7;
+}
+footer a { color: var(--muted); text-decoration: none; }
+
+@media(max-width:600px) {
+  .step-q { font-size: 15pt; }
+  .res-title { font-size: 16pt; }
+  .step-card, .res-card { padding: 20px 16px; }
+  .phase-bar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">BrainTaiwan · ER</div>
+    <div class="tool-title">急性顱內出血管理</div>
+    <div class="tool-sub">Spontaneous ICH · 治療決策輔助 · 2022 AHA/ASA · INTERACT3 · ENRICH</div>
+  </div>
+</header>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="/">首頁</a>
+    <span style="color:var(--border)">›</span>
+    <a href="ich.html" class="cur">急性顱內出血</a>
+  </div>
+</nav>
+
+<main>
+  <div id="app"></div>
+</main>
+
+<footer>
+  <strong>⚠️ 免責聲明</strong>：本工具為臨床決策輔助，不取代個別病人臨床判斷。所有治療決定須依醫師評估執行。<br>
+  資料來源：Greenberg SM et al. 2022 AHA/ASA ICH Guideline <em>Stroke</em> 2022 ／ Ma L et al. INTERACT3 <em>Lancet</em> 2023 ／ Pradilla G et al. ENRICH <em>NEJM</em> 2024<br>
+  © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a>
+</footer>
+
+<script>
+// ── PHASE BAR LABELS ──
+const PHASES = [
+  { label: '診斷確認', time: 'NCCT',     cls: 'ph-0' },
+  { label: '穩定 + 血壓', time: '<1 h',  cls: 'ph-1' },
+  { label: '抗凝逆轉', time: 'ASAP',     cls: 'ph-2' },
+  { label: '手術評估', time: '個別化',    cls: 'ph-3' },
+  { label: 'ICP / 監測', time: '持續',   cls: 'ph-4' },
+];
+
+// ── STEPS ──
+const STEPS = {
+
+  confirm: {
+    num: 1, title: 'STEP 1', phase: 0,
+    q: '影像確認與初步評估',
+    hint: '急性發作的局灶神經缺損 + 頭痛/意識改變，立即非顯影 CT（NCCT）。確認是否為自發性顱內出血。',
+    opts: [
+      { main: '確認自發性 ICH', sub: 'NCCT 顯示腦實質出血，無外傷史', val: 'stabilize' },
+      { main: '懷疑 ICH，影像未完成', sub: '優先安排 NCCT，同時穩定生命徵象', val: 'result_image' },
+      { main: '確認為缺血性中風 / SAH', sub: '本工具不適用', val: 'result_wrong' },
+    ],
+    next: { stabilize: 'stabilize', result_image: 'result_image', result_wrong: 'result_wrong' }
+  },
+
+  stabilize: {
+    num: 2, title: 'STEP 2', phase: 1,
+    q: '穩定與同步措施',
+    hint: '以下同步進行，並計算 ICH Score（GCS、年齡≥80、出血量≥30mL、IVH、幕下）以利溝通預後與監護分級。',
+    chk: [
+      '氣道評估：GCS ≤ 8、無法保護氣道、急速惡化 → 考慮插管',
+      '建立 IV、心電圖與血氧監測',
+      '床旁血糖；抽血含 CBC、凝血（PT/INR、aPTT）、電解質、腎功能',
+      '詳細用藥史：抗凝劑 / 抗血小板劑（種類、最後一次劑量時間）',
+      '量基準神經學分數（NIHSS / GCS），記錄出血量與是否 IVH',
+      '神經外科會診（依出血位置與惡化風險）',
+    ],
+    opts: [ { main: '已完成，進入血壓控制', val: 'bp_assess' } ],
+    next: { bp_assess: 'bp_assess' }
+  },
+
+  bp_assess: {
+    num: 3, title: 'STEP 3', phase: 1,
+    q: '收縮壓（SBP）範圍？',
+    hint: 'INTERACT3 整合照護組合（含早期降壓）改善預後。降壓應平順、避免大幅波動。',
+    opts: [
+      { main: 'SBP 150–220 mmHg', sub: '可降壓，目標 SBP 130–150', val: 'result_bp_moderate' },
+      { main: 'SBP > 220 mmHg', sub: '持續靜脈點滴積極降壓 + 動脈監測', val: 'result_bp_severe' },
+      { main: 'SBP < 150 mmHg', sub: '維持灌流，避免過度降壓', val: 'result_bp_low' },
+    ],
+    next: { result_bp_moderate: 'result_bp_moderate', result_bp_severe: 'result_bp_severe', result_bp_low: 'result_bp_low' }
+  },
+
+  anticoag: {
+    num: 4, title: 'STEP 4', phase: 2,
+    q: '抗凝 / 抗血小板狀態？',
+    hint: '凝血異常是血腫擴大的可逆危險因子，逆轉應盡早。依藥物種類選擇對應策略。',
+    opts: [
+      { main: 'Warfarin / 維生素 K 拮抗劑（VKA）', sub: 'INR 升高', val: 'result_warfarin' },
+      { main: '第 Xa 因子抑制劑', sub: 'Apixaban / Rivaroxaban / Edoxaban', val: 'result_xa' },
+      { main: 'Dabigatran（直接凝血酶抑制劑）', sub: '', val: 'result_dabi' },
+      { main: '抗血小板劑', sub: 'Aspirin / Clopidogrel', val: 'result_antiplatelet' },
+      { main: 'Heparin / 低分子量肝素', sub: '', val: 'result_heparin' },
+      { main: '無抗凝 / 抗血小板', sub: '凝血功能正常', val: 'surgery_eval' },
+    ],
+    next: {
+      result_warfarin: 'result_warfarin', result_xa: 'result_xa', result_dabi: 'result_dabi',
+      result_antiplatelet: 'result_antiplatelet', result_heparin: 'result_heparin', surgery_eval: 'surgery_eval'
+    }
+  },
+
+  surgery_eval: {
+    num: 5, title: 'STEP 5', phase: 3,
+    q: '出血位置與特徵？',
+    hint: '手術適應症依位置而異。小腦出血是少數有明確證據的急救手術；幕上出血則須個別化。',
+    opts: [
+      { main: '小腦出血 > 3 cm，或腦幹壓迫 / 水腦', sub: '神經學惡化', val: 'result_cerebellar' },
+      { main: '幕上腦葉出血（lobar）', sub: '可考慮微創清除（ENRICH）', val: 'result_lobar' },
+      { main: '深部出血（基底核 / 視丘）', sub: '', val: 'result_deep' },
+      { main: '合併腦室出血（IVH）/ 急性水腦', sub: '', val: 'result_hydro' },
+    ],
+    next: {
+      result_cerebellar: 'result_cerebellar', result_lobar: 'result_lobar',
+      result_deep: 'result_deep', result_hydro: 'result_hydro'
+    }
+  },
+};
+
+// ── SHARED SUPPORTIVE BUNDLE (附加於手術評估後的最終結果) ──
+const BUNDLE = `
+  <div class="bundle-box">
+    <h4>📋 後續照護組合（INTERACT3 bundle + 2022 指引）</h4>
+    <ul class="act-list">
+      <li><span>🩸</span><strong>血壓</strong>：平順維持目標 SBP 130–150，避免波動；起病 24h 內最關鍵</li>
+      <li><span>🍬</span><strong>血糖</strong>：維持 140–180 mg/dL，避免低血糖與高血糖</li>
+      <li><span>🌡️</span><strong>體溫</strong>：積極控制發燒（&gt; 37.5°C）</li>
+      <li><span>⚡</span><strong>癲癇</strong>：治療臨床或 EEG 確認之發作；<u>不建議</u>預防性抗癲癇藥</li>
+      <li><span>🦵</span><strong>VTE 預防</strong>：入院即用間歇性氣動加壓；出血穩定後 24–48h 可加藥物預防</li>
+      <li><span>🔁</span><strong>追蹤影像</strong>：惡化或起病 6h 內者，複查 NCCT 評估血腫擴大</li>
+    </ul>
+  </div>`;
+
+// ── RESULTS ──
+const RESULTS = {
+
+  result_image: {
+    type: 'yellow', badge: '⏱️ 待影像', title: '優先完成 NCCT', phase: 0,
+    html: `<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">在影像確認前先穩定生命徵象，勿延誤 CT。</p>
+      <ul class="act-list">
+        <li><span>🖥️</span>立即非顯影 CT（NCCT）——區分出血 vs 缺血</li>
+        <li><span>🩺</span>同步評估氣道、監測、血糖、凝血</li>
+        <li><span>🔍</span>若疑血管異常（年輕、無高血壓、不典型位置）→ 加做 CTA</li>
+      </ul>`
+  },
+
+  result_wrong: {
+    type: 'gray', badge: '↩︎ 不適用', title: '此工具僅適用自發性 ICH', phase: 0,
+    html: `<p style="font-size:13pt;color:#e6edf3;line-height:1.6;">缺血性中風請參考 <a href="ais.html" style="color:var(--ora)">AIS 治療決策</a>。蛛網膜下腔出血（SAH）需另循動脈瘤處置流程（Hunt-Hess / WFNS 分級、nimodipine、血管痙攣監測）。</p>`
+  },
+
+  result_bp_moderate: {
+    type: 'green', badge: '✅ 可降壓', title: '降壓目標 SBP 130–150 mmHg', phase: 1, cont: 'anticoag',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">SBP 150–220 的輕中度 ICH，於 1 小時內平順降至目標範圍是安全的，可能改善功能預後。</p>
+      <div class="drug-box">
+        <div class="drug-name alt">▶ Labetalol（首選之一）</div>
+        <div class="drug-dose">10–20 mg IV bolus，可重複；或 0.5–2 mg/min 點滴</div>
+        <div class="drug-detail">心搏過緩、氣喘、心衰竭者慎用</div>
+      </div>
+      <div class="drug-box">
+        <div class="drug-name alt">▶ Nicardipine 點滴</div>
+        <div class="drug-dose">5 mg/hr 起，每 5–15 分鐘加 2.5 mg/hr（上限 15 mg/hr）</div>
+        <div class="drug-detail">易滴定、降壓平順，適合持續控制</div>
+      </div>
+      <div class="warn-inline">⚠️ 避免快速降至 SBP &lt; 130 mmHg——可能有害。重點是「平順、持續、低波動」。</div>
+      <div class="ref-box">2022 AHA/ASA ICH Guideline（COR 2b）／ INTERACT3, Lancet 2023</div>`
+  },
+
+  result_bp_severe: {
+    type: 'red', badge: '🔴 重度高血壓', title: 'SBP > 220——持續點滴積極降壓', phase: 1, cont: 'anticoag',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">建議以連續靜脈點滴降壓並建立動脈導管監測，避免血腫擴大；目標亦以避免大幅波動為原則。</p>
+      <div class="drug-box">
+        <div class="drug-name alt">▶ Nicardipine 或 Clevidipine 點滴</div>
+        <div class="drug-dose">Nicardipine 5–15 mg/hr 滴定 ｜ Clevidipine 1–2 mg/hr 起</div>
+        <div class="drug-detail">連續點滴 + 動脈血壓監測，平順降低，避免驟降造成低灌流</div>
+      </div>
+      <div class="warn-inline">⚠️ 此族群證據較有限，降壓需更謹慎滴定；密切觀察神經學變化。</div>
+      <div class="ref-box">2022 AHA/ASA ICH Guideline</div>`
+  },
+
+  result_bp_low: {
+    type: 'blue', badge: 'ℹ️ 維持灌流', title: 'SBP < 150——維持，勿過度降壓', phase: 1, cont: 'anticoag',
+    html: `<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">血壓已在目標範圍下緣，避免進一步降壓造成腦灌流不足。</p>
+      <ul class="act-list">
+        <li><span>📊</span>持續監測血壓，維持 SBP 約 130–150</li>
+        <li><span>🚫</span>若 SBP 明顯偏低，評估是否有出血外因素（敗血、心因性）</li>
+      </ul>`
+  },
+
+  result_warfarin: {
+    type: 'green', badge: '💉 逆轉 VKA', title: 'Warfarin 逆轉：4F-PCC + 維生素 K', phase: 2, cont: 'surgery_eval',
+    html: `
+      <div class="drug-box">
+        <div class="drug-name">▶ 4 因子凝血酶原複合物（4F-PCC）</div>
+        <div class="drug-dose">依 INR 與體重給藥（約 25–50 U/kg）</div>
+        <div class="drug-detail">優於 FFP（起效快、容量少）｜ 目標 INR &lt; 1.3</div>
+      </div>
+      <div class="drug-box">
+        <div class="drug-name alt">▶ 維生素 K</div>
+        <div class="drug-dose">10 mg 緩慢 IV</div>
+        <div class="drug-detail">與 PCC 併用以維持持續逆轉效果</div>
+      </div>
+      <div class="warn-inline">⚠️ 立即停用 warfarin。複查 INR 確認逆轉成功。</div>
+      <div class="ref-box">2022 AHA/ASA ICH Guideline（COR 1）</div>`
+  },
+
+  result_xa: {
+    type: 'green', badge: '💉 逆轉 Xa 抑制劑', title: '第 Xa 因子抑制劑逆轉', phase: 2, cont: 'surgery_eval',
+    html: `
+      <div class="drug-box">
+        <div class="drug-name">▶ Andexanet alfa（若可取得，首選）</div>
+        <div class="drug-dose">依藥物種類與最後劑量時間採高/低劑量方案</div>
+        <div class="drug-detail">專一性逆轉劑 ｜ 注意血栓風險與費用/可近性</div>
+      </div>
+      <div class="drug-box">
+        <div class="drug-name alt">▶ 4F-PCC（無 andexanet 時）</div>
+        <div class="drug-dose">50 U/kg</div>
+        <div class="drug-detail">替代方案 ｜ 最後一次服藥 &lt; 2 小時可考慮活性碳</div>
+      </div>
+      <div class="ref-box">2022 AHA/ASA ICH Guideline</div>`
+  },
+
+  result_dabi: {
+    type: 'green', badge: '💉 逆轉 Dabigatran', title: 'Dabigatran 逆轉：Idarucizumab', phase: 2, cont: 'surgery_eval',
+    html: `
+      <div class="drug-box">
+        <div class="drug-name">▶ Idarucizumab</div>
+        <div class="drug-dose">5 g IV（2 × 2.5 g）</div>
+        <div class="drug-detail">專一性單株抗體逆轉劑，起效迅速（COR 1）</div>
+      </div>
+      <div class="warn-inline">⚠️ 無 idarucizumab 時可考慮 4F-PCC 50 U/kg；最後服藥 &lt; 2h 可活性碳；嚴重時血液透析可清除 dabigatran。</div>
+      <div class="ref-box">2022 AHA/ASA ICH Guideline</div>`
+  },
+
+  result_antiplatelet: {
+    type: 'yellow', badge: '⚠️ 抗血小板', title: '抗血小板劑：不常規輸血小板', phase: 2, cont: 'surgery_eval',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">服用抗血小板劑的自發性 ICH 患者，<strong>若不接受神經外科手術，輸血小板可能有害</strong>，不建議常規使用（PATCH 試驗）。</p>
+      <ul class="act-list">
+        <li><span>🚫</span>非手術病人：<strong>不</strong>常規輸血小板</li>
+        <li><span>🔪</span>若將接受神經外科手術：可考慮輸血小板</li>
+        <li><span>💊</span>可考慮 DDAVP（desmopressin）0.4 µg/kg IV 作為輔助</li>
+      </ul>
+      <div class="ref-box">PATCH trial, Lancet 2016 ／ 2022 AHA/ASA ICH Guideline</div>`
+  },
+
+  result_heparin: {
+    type: 'green', badge: '💉 逆轉 Heparin', title: 'Heparin 逆轉：Protamine', phase: 2, cont: 'surgery_eval',
+    html: `
+      <div class="drug-box">
+        <div class="drug-name">▶ Protamine sulfate</div>
+        <div class="drug-dose">1 mg / 每 100 U 未分餾肝素（單次上限 50 mg）</div>
+        <div class="drug-detail">依肝素給藥時間調整劑量 ｜ LMWH 部分逆轉（enoxaparin 約 1 mg / 1 mg）</div>
+      </div>
+      <div class="warn-inline">⚠️ 緩慢給藥，注意低血壓與過敏反應。</div>
+      <div class="ref-box">2022 AHA/ASA ICH Guideline</div>`
+  },
+
+  result_cerebellar: {
+    type: 'red', badge: '🔪 緊急手術', title: '小腦出血——緊急手術清除', phase: 3,
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">小腦出血 &gt; 3 cm，或合併腦幹壓迫、第四腦室阻塞性水腦、神經學惡化者，<strong>應緊急手術清除血腫</strong>——這是少數有明確存活與功能效益的 ICH 手術。</p>
+      <ul class="act-list">
+        <li><span>🔪</span><strong>立即神經外科後窩血腫清除</strong>（COR 1）</li>
+        <li><span>🚫</span>勿單獨以 EVD 引流取代清除——對惡化的小腦出血不足且可能延誤</li>
+        <li><span>📊</span>持續 GCS / 瞳孔監測，準備氣道保護</li>
+      </ul>
+      ${BUNDLE}
+      <div class="ref-box">2022 AHA/ASA ICH Guideline（COR 1）</div>`
+  },
+
+  result_lobar: {
+    type: 'blue', badge: '🧠 幕上腦葉', title: '幕上腦葉出血——個別化評估微創清除', phase: 3,
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">ENRICH 試驗顯示，對符合條件的腦葉 ICH，早期（24h 內）微創手術清除可改善功能預後。需個別化評估出血量、位置與臨床狀態。</p>
+      <ul class="act-list">
+        <li><span>🧠</span>符合條件的腦葉出血：可考慮<strong>早期微創清除</strong>（ENRICH）</li>
+        <li><span>⚕️</span>大血腫合併佔位效應 / 惡化：開顱清除可作為救命手段</li>
+        <li><span>🔍</span>不典型位置 / 年輕 / 無高血壓 → 評估血管異常或腫瘤（CTA / MRI）</li>
+      </ul>
+      ${BUNDLE}
+      <div class="ref-box">ENRICH trial, NEJM 2024 ／ MISTIE III, Lancet 2019 ／ 2022 AHA/ASA Guideline</div>`
+  },
+
+  result_deep: {
+    type: 'yellow', badge: '⚠️ 深部出血', title: '深部出血（基底核 / 視丘）——多採內科治療', phase: 3,
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">深部出血常規開顱清除未顯示功能效益。以積極內科照護為主，手術保留為救命用途。</p>
+      <ul class="act-list">
+        <li><span>💊</span>以照護組合為主（血壓、抗凝逆轉、ICP 管理）</li>
+        <li><span>⚕️</span>大血腫合併昏迷 / 中線位移 / 難治性 ICP → 減壓開顱可降低死亡率（但功能預後不確定）</li>
+        <li><span>📊</span>密切監測神經學變化與血腫擴大</li>
+      </ul>
+      ${BUNDLE}
+      <div class="ref-box">STICH / STICH II ／ 2022 AHA/ASA ICH Guideline</div>`
+  },
+
+  result_hydro: {
+    type: 'purple', badge: '💧 水腦 / IVH', title: '腦室出血 / 急性水腦——腦室外引流', phase: 4,
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">合併腦室出血造成阻塞性水腦、意識下降者，應放置腦室外引流（EVD）監測並引流腦脊髓液。</p>
+      <ul class="act-list">
+        <li><span>💧</span><strong>腦室外引流（EVD）</strong>——意識下降合併急性水腦者</li>
+        <li><span>📊</span>EVD 同時可監測 ICP</li>
+        <li><span>💉</span>腦室內 alteplase（CLEAR III）未改善 mRS，但可降低死亡率——非常規</li>
+      </ul>
+      <div class="bundle-box">
+        <h4>🧠 ICP / 腦疝階梯式處置</h4>
+        <ul class="act-list">
+          <li><span>1️⃣</span>抬高床頭 30°、頭頸正中、鎮靜止痛</li>
+          <li><span>2️⃣</span>高滲治療：Mannitol 0.5–1 g/kg，或 3% 高張鹽水</li>
+          <li><span>3️⃣</span>暫時性過度換氣（PaCO₂ 30–35）作為橋接</li>
+          <li><span>4️⃣</span>難治性 → 減壓開顱 / 持續 CSF 引流</li>
+        </ul>
+      </div>
+      ${BUNDLE}
+      <div class="ref-box">CLEAR III, Lancet 2017 ／ 2022 AHA/ASA ICH Guideline</div>`
+  },
+};
+
+// ── STATE ──
+let path = [];
+let cur  = 'confirm';
+
+const STEP_LABELS = {
+  confirm: '診斷', stabilize: '穩定', bp_assess: '血壓',
+  anticoag: '抗凝逆轉', surgery_eval: '手術評估',
+};
+
+function getOptLabel(sid, val) {
+  const s = STEPS[sid]; if (!s) return val;
+  const o = s.opts && s.opts.find(x => x.val === val);
+  return o ? o.main : val;
+}
+
+function renderPhaseBar(activePhase) {
+  return '<div class="phase-bar">' +
+    PHASES.map((p, i) =>
+      `<div class="phase-seg ${p.cls}${i === activePhase ? ' act' : ''}">
+        ${p.label}<br><span style="font-size:9pt;opacity:.75">${p.time}</span>
+      </div>`
+    ).join('') +
+  '</div>';
+}
+
+function renderCrumbs() {
+  if (!path.length) return '';
+  return '<div class="crumb">' +
+    path.map(p =>
+      `<div class="crumb-item">
+        <span class="crumb-lbl">${STEP_LABELS[p.s] || p.s}</span>
+        <span style="color:#555;margin:0 3px">›</span>
+        <span class="crumb-val">${getOptLabel(p.s, p.v)}</span>
+      </div>`
+    ).join('') +
+  '</div>';
+}
+
+function renderNavBtns() {
+  if (!path.length) return '';
+  return `<div class="nav-btns" style="margin-top:20px;">
+    <button class="nav-btn" onclick="goBack()">← 上一步</button>
+    <button class="nav-btn" onclick="reset()">↺ 重新開始</button>
+  </div>`;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (cur.startsWith('result_')) { renderResult(app); return; }
+
+  const step = STEPS[cur];
+  if (!step) { app.innerHTML = `<p style="color:red">Step not found: ${cur}</p>`; return; }
+
+  let h = renderPhaseBar(step.phase ?? 0);
+  h += renderCrumbs();
+  h += `<div class="step-card">`;
+  h += `<div class="step-meta"><div class="step-dot">${step.num}</div><span>${step.title}</span></div>`;
+  h += `<div class="step-q">${step.q}</div>`;
+  if (step.hint) h += `<div class="step-hint">${step.hint}</div>`;
+
+  if (step.chk) {
+    h += `<div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+      <ul style="list-style:none;">`;
+    step.chk.forEach(c => {
+      h += `<li style="font-size:11.5pt;color:#e6edf3;padding:5px 0 5px 22px;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;">
+        <span style="position:absolute;left:0;">☐</span>${c}</li>`;
+    });
+    h += `</ul></div>`;
+  }
+
+  h += `<div class="options">`;
+  step.opts.forEach(o => {
+    h += `<button class="opt-btn" onclick="choose('${cur}','${o.val}')">
+      <span class="opt-main">${o.main}</span>
+      ${o.sub ? `<span class="opt-sub">${o.sub}</span>` : ''}
+    </button>`;
+  });
+  h += `</div>`;
+
+  h += renderNavBtns();
+  h += `</div>`;
+  app.innerHTML = h;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderResult(app) {
+  const r = RESULTS[cur];
+  if (!r) { app.innerHTML = `<p style="color:red">Result not found: ${cur}</p>`; return; }
+
+  let h = renderPhaseBar(r.phase ?? 0);
+  h += renderCrumbs();
+  h += `<div class="res-card ${r.type}">`;
+  h += `<div class="res-badge">${r.badge}</div>`;
+  h += `<div class="res-title">${r.title}</div>`;
+  h += r.html;
+  h += `</div>`;
+  if (r.cont) {
+    const lbl = STEP_LABELS[r.cont] || '繼續';
+    h += `<div class="nav-btns" style="margin-top:16px;">
+      <button class="cont-btn" onclick="advance('${r.cont}')">繼續 → ${lbl}</button>
+    </div>`;
+  }
+  h += renderNavBtns();
+  app.innerHTML = h;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function choose(stepId, val) {
+  path.push({ s: stepId, v: val });
+  cur = STEPS[stepId].next[val];
+  render();
+}
+
+function advance(stepId) {
+  cur = stepId;
+  render();
+}
+
+function goBack() {
+  if (!path.length) return;
+  // 若目前在透過 cont 前進的步驟（path 末項的 next 不是目前步驟），單純退回末項目標
+  const last = path[path.length - 1];
+  const expected = STEPS[last.s] ? STEPS[last.s].next[last.v] : null;
+  if (expected !== cur) {
+    // 目前是 cont 前進來的步驟，退回該結果頁
+    cur = expected;
+    render();
+    return;
+  }
+  path.pop();
+  cur = last.s;
+  render();
+}
+
+function reset() { path = []; cur = 'confirm'; render(); }
+
+render();
+</script>
+</body>
+</html>
