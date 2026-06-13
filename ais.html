@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIS 治療決策 — BrainTaiwan ER</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0d1117;
+  --surf:     #161b22;
+  --surf2:    #21262d;
+  --border:   #30363d;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --red:      #f85149;
+  --red-dim:  #3d1515;
+  --blue:     #58a6ff;
+  --blue-dim: #0d2137;
+  --green:    #3fb950;
+  --grn-dim:  #0d2e0d;
+  --ylw:      #d29922;
+  --ylw-dim:  #2e2000;
+  --ora:      #ff7b2e;
+}
+
+body {
+  font-family: 'Segoe UI','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(135deg,#1a0505 0%,#2d0a0a 55%,#420f0f 100%);
+  border-bottom: 1px solid #5c1c1c;
+  padding: 18px 24px;
+}
+.header-inner { max-width: 800px; margin: 0 auto; }
+.brand { font-size: 10pt; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+.tool-title { font-size: 22pt; font-weight: 700; color: white; line-height: 1.2; }
+.tool-sub { font-size: 11pt; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+/* ── TOPNAV ── */
+.topnav { background: var(--surf); border-bottom: 1px solid var(--border); padding: 10px 24px; }
+.topnav-inner { max-width: 800px; margin: 0 auto; display: flex; gap: 6px; align-items: center; }
+.topnav a { color: var(--muted); text-decoration: none; font-size: 10.5pt; padding: 5px 12px; border-radius: 6px; transition: background 0.15s; }
+.topnav a:hover { background: var(--surf2); color: var(--text); }
+.topnav .cur { color: var(--ora); font-weight: 600; }
+
+/* ── MAIN ── */
+main { max-width: 800px; margin: 0 auto; padding: 28px 20px 72px; }
+
+/* ── BREADCRUMB ── */
+.crumb { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.crumb-item {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 12px; font-size: 10pt;
+  display: flex; gap: 6px; align-items: center;
+}
+.crumb-lbl { color: var(--muted); }
+.crumb-val { color: var(--text); font-weight: 600; }
+
+/* ── STEP CARD ── */
+.step-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 12px; padding: 28px 28px 24px;
+}
+.step-meta {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 10pt; color: var(--muted); margin-bottom: 10px;
+}
+.step-dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--ora); color: white; font-size: 10pt; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-q { font-size: 18pt; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 8px; }
+.step-hint { font-size: 11pt; color: var(--muted); line-height: 1.55; margin-bottom: 20px; }
+
+/* ── CHECKLIST ── */
+.chk-box {
+  background: var(--surf2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px 18px; margin-bottom: 18px;
+}
+.chk-title { font-size: 10.5pt; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
+.chk-list { list-style: none; }
+.chk-list li {
+  font-size: 11.5pt; color: var(--text); padding: 6px 0 6px 24px;
+  border-bottom: 1px solid var(--border); position: relative;
+}
+.chk-list li::before { content: '⚠️'; position: absolute; left: 0; font-size: 10pt; top: 7px; }
+.chk-list li:last-child { border-bottom: none; }
+
+/* ── DAWN TABLE ── */
+.dawn-box {
+  background: rgba(0,0,0,0.35); border-radius: 8px; padding: 16px 18px; margin-bottom: 18px;
+  font-size: 11pt; line-height: 1.7; color: var(--text);
+}
+.dawn-h { font-size: 11.5pt; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+
+/* ── OPTIONS ── */
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.opt-btn {
+  background: var(--surf2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px 20px;
+  text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.opt-btn:hover { border-color: var(--ora); background: #1e1208; }
+.opt-main { font-size: 14pt; font-weight: 600; color: var(--text); }
+.opt-sub  { font-size: 10.5pt; color: var(--muted); }
+
+/* ── NAV BUTTONS ── */
+.nav-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-btn {
+  padding: 10px 18px; background: var(--surf2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--muted); cursor: pointer; font-size: 11pt; transition: all 0.15s;
+}
+.nav-btn:hover { border-color: var(--muted); color: var(--text); }
+
+/* ── RESULT CARD ── */
+.res-card { border-radius: 12px; padding: 28px; }
+.res-card.green  { background: var(--grn-dim); border: 1px solid #1a5c1a; }
+.res-card.blue   { background: var(--blue-dim); border: 1px solid #1a3d60; }
+.res-card.yellow { background: var(--ylw-dim);  border: 1px solid #4a3800; }
+.res-card.gray   { background: var(--surf);     border: 1px solid var(--border); }
+
+.res-badge {
+  display: inline-block; font-size: 10pt; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+}
+.green .res-badge  { background: #174d17; color: var(--green); }
+.blue  .res-badge  { background: #0a2845; color: var(--blue); }
+.yellow .res-badge { background: #3a2800; color: var(--ylw); }
+.gray  .res-badge  { background: var(--surf2); color: var(--muted); }
+
+.res-title { font-size: 20pt; font-weight: 700; color: white; margin-bottom: 18px; line-height: 1.25; }
+
+/* ── DRUG BOX ── */
+.drug-box {
+  background: rgba(0,0,0,0.35); border-radius: 10px;
+  padding: 16px 18px; margin: 12px 0;
+}
+.drug-name { font-size: 12pt; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.drug-name.alt { color: var(--blue); }
+.drug-dose { font-size: 18pt; font-weight: 700; color: white; }
+.drug-detail { font-size: 11pt; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+/* ── BP BOX ── */
+.bp-row { display: flex; gap: 16px; flex-wrap: wrap; margin: 14px 0; }
+.bp-item { background: rgba(0,0,0,0.35); border-radius: 8px; padding: 12px 18px; text-align: center; }
+.bp-lbl { font-size: 9.5pt; color: var(--muted); margin-bottom: 4px; }
+.bp-val { font-size: 20pt; font-weight: 700; color: white; }
+.bp-unit { font-size: 9.5pt; color: var(--muted); }
+
+/* ── ACTION LIST ── */
+.act-list { list-style: none; margin: 12px 0; }
+.act-list li {
+  font-size: 12pt; color: var(--text); padding: 9px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; gap: 10px; align-items: flex-start; line-height: 1.5;
+}
+.act-list li:last-child { border-bottom: none; }
+.act-icon { flex-shrink: 0; }
+
+/* ── WARN / REF ── */
+.warn-inline {
+  background: rgba(210,153,34,0.15); border: 1px solid rgba(210,153,34,0.3);
+  border-radius: 6px; padding: 12px 14px; font-size: 11.5pt; color: var(--ylw);
+  margin: 12px 0; line-height: 1.5;
+}
+.ref-box {
+  margin-top: 18px; padding: 12px 14px;
+  background: rgba(0,0,0,0.3); border-radius: 6px;
+  font-size: 10pt; color: var(--muted); line-height: 1.5;
+}
+
+footer {
+  background: var(--surf); border-top: 1px solid var(--border);
+  text-align: center; padding: 20px 24px;
+  font-size: 10pt; color: var(--muted); margin-top: 40px; line-height: 1.7;
+}
+footer a { color: var(--muted); text-decoration: none; }
+
+@media(max-width:600px) {
+  .step-q { font-size: 15pt; }
+  .res-title { font-size: 17pt; }
+  .drug-dose { font-size: 16pt; }
+  .step-card, .res-card { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">BrainTaiwan · ER</div>
+    <div class="tool-title">急性缺血性中風</div>
+    <div class="tool-sub">Acute Ischemic Stroke · 治療決策輔助 · 2026 AHA/ASA</div>
+  </div>
+</header>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="/" >首頁</a>
+    <span style="color:var(--border)">›</span>
+    <a href="ais.html" class="cur">急性缺血性中風</a>
+  </div>
+</nav>
+
+<main>
+  <div id="app"></div>
+</main>
+
+<footer>
+  <strong>⚠️ 免責聲明</strong>：本工具為臨床決策輔助，不取代個別病人臨床判斷。所有治療決定須依醫師評估執行。<br>
+  資料來源：Prabhakaran S et al. <em>2026 Guideline for the Early Management of Patients with AIS.</em> Stroke. 2026.<br>
+  © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a>
+</footer>
+
+<script>
+// ── STEPS ──
+const STEPS = {
+
+  time: {
+    num: 1, title: 'STEP 1',
+    q: '症狀發作 / LKWT 距現在？',
+    hint: '以「最後確認正常」（Last Known Well Time）起算；若患者於睡眠中發現症狀，選「不明 / 醒後中風」',
+    opts: [
+      { main: '< 4.5 小時', sub: '確認發作時間或 LKWT', val: 'lt45' },
+      { main: '4.5 – 9 小時', sub: '', val: 'h459' },
+      { main: '9 – 24 小時', sub: '', val: 'h924' },
+      { main: '不明 / 醒後中風', sub: 'Last Known Well 無法確定', val: 'wakeup' },
+    ],
+    next: { lt45:'nihss', h459:'lvo_h459', h924:'lvo_h924', wakeup:'lvo_wakeup' }
+  },
+
+  nihss: {
+    num: 2, title: 'STEP 2',
+    q: 'NIHSS 及功能性失能評估',
+    hint: '決定 IVT 臨床獲益是否大於出血風險',
+    opts: [
+      { main: 'NIHSS ≥ 4 或有功能性失能', sub: '肢體無力、失語、吞嚥困難、明顯感覺障礙、視野缺損合併失能', val: 'sig' },
+      { main: 'NIHSS < 4 且無失能症狀', sub: '純感覺異常、輕微頭暈、輕微視野缺損但功能正常', val: 'minor' },
+    ],
+    next: { sig:'ivt_contra', minor:'result_minor' }
+  },
+
+  ivt_contra: {
+    num: 3, title: 'STEP 3',
+    q: 'IVT 禁忌症核對',
+    hint: null,
+    chk: [
+      '近 3 個月顱內出血病史',
+      '已知顱內惡性腫瘤、AVM 或未治療動脈瘤',
+      '收縮壓 > 185 mmHg 或舒張壓 > 110 mmHg（降壓後仍未達目標）',
+      '血糖 < 50 mg/dL 或 > 400 mg/dL',
+      '近 48h 使用治療劑量肝素且 APTT 超過正常上限',
+      'NOAC 使用中（< 48h 服藥 或 無逆轉劑）',
+      'Warfarin 使用且 INR > 1.7',
+      '近 3 個月顱內 / 脊椎手術或嚴重頭部外傷',
+      '急性出血體質（血小板 < 100K、活動性內出血）',
+    ],
+    opts: [
+      { main: '無禁忌症', sub: '上述均不符合', val: 'no' },
+      { main: '有禁忌症（≥ 1 項）', sub: '', val: 'yes' },
+    ],
+    next: { no:'lvo_lt45', yes:'lvo_contra' }
+  },
+
+  lvo_lt45: {
+    num: 4, title: 'STEP 4',
+    q: 'LVO 狀態（CTA）',
+    hint: 'ICA、M1 / M2 MCA、椎動脈、基底動脈',
+    opts: [
+      { main: '有 LVO', sub: '大血管閉塞確認', val: 'yes' },
+      { main: '無 LVO', sub: '', val: 'no' },
+      { main: 'CTA 尚未完成', sub: '先啟動 IVT，同步安排 CTA', val: 'pending' },
+    ],
+    next: { yes:'aspects_lt45', no:'result_ivt_only', pending:'result_ivt_cta' }
+  },
+
+  aspects_lt45: {
+    num: 5, title: 'STEP 5',
+    q: 'ASPECTS（NCCT 或 DWI）',
+    hint: '評估梗塞核心大小以決定 EVT 適合度',
+    opts: [
+      { main: 'ASPECTS ≥ 6', sub: '梗塞未超過 MCA 區域 40%', val: 'high' },
+      { main: 'ASPECTS 3 – 5', sub: 'Large core（TESLA / SELECT2 / ANGEL-ASPECT）', val: 'mid' },
+      { main: 'ASPECTS < 3', sub: '廣泛梗塞，EVT 獲益不確定', val: 'low' },
+    ],
+    next: { high:'result_ivt_evt', mid:'result_ivt_evt_lc', low:'result_ivt_no_evt' }
+  },
+
+  lvo_contra: {
+    num: 4, title: 'STEP 4',
+    q: 'LVO 狀態（IVT 禁忌，評估 EVT）',
+    hint: 'IVT 有禁忌，大血管閉塞仍可行機械取栓',
+    opts: [
+      { main: '有 LVO', sub: '大血管閉塞確認', val: 'yes' },
+      { main: '無 LVO', sub: '', val: 'no' },
+    ],
+    next: { yes:'aspects_contra', no:'result_supportive' }
+  },
+
+  aspects_contra: {
+    num: 5, title: 'STEP 5',
+    q: 'ASPECTS？',
+    hint: null,
+    opts: [
+      { main: 'ASPECTS ≥ 6', sub: '', val: 'high' },
+      { main: 'ASPECTS 3 – 5', sub: 'Large core', val: 'mid' },
+      { main: 'ASPECTS < 3', sub: '廣泛梗塞', val: 'low' },
+    ],
+    next: { high:'result_evt_only', mid:'result_evt_only_lc', low:'result_supportive' }
+  },
+
+  // ── 4.5–9h branch ──
+  lvo_h459: {
+    num: 2, title: 'STEP 2',
+    q: 'LVO 狀態（CTA）',
+    hint: '4.5–9h：EVT 適用；IVT 需 mismatch 確認才建議',
+    opts: [
+      { main: '有 LVO', val: 'yes' },
+      { main: '無 LVO', val: 'no' },
+    ],
+    next: { yes:'aspects_h459', no:'mismatch_h459' }
+  },
+
+  aspects_h459: {
+    num: 3, title: 'STEP 3',
+    q: 'ASPECTS？',
+    hint: null,
+    opts: [
+      { main: 'ASPECTS ≥ 6', val: 'high' },
+      { main: 'ASPECTS 3 – 5', sub: 'Large core', val: 'mid' },
+      { main: 'ASPECTS < 3', sub: '廣泛梗塞', val: 'low' },
+    ],
+    next: { high:'result_evt_h459', mid:'result_evt_h459_lc', low:'result_supportive' }
+  },
+
+  mismatch_h459: {
+    num: 3, title: 'STEP 3',
+    q: 'Penumbra/Core Mismatch（CTP / PWI）？',
+    hint: 'EXTEND 標準：Tmax > 6s 體積 ÷ 梗塞核心 ≥ 1.2，且 mismatch > 10 mL',
+    opts: [
+      { main: '有 mismatch（符合 EXTEND 標準）', val: 'yes' },
+      { main: '無 mismatch', val: 'no' },
+      { main: '未做 CTP', val: 'pending' },
+    ],
+    next: { yes:'result_ivt_extend', no:'result_dapt', pending:'result_get_ctp' }
+  },
+
+  // ── 9–24h branch ──
+  lvo_h924: {
+    num: 2, title: 'STEP 2',
+    q: 'LVO 狀態（CTA）',
+    hint: '9–24h：需 LVO + 符合 DAWN / DEFUSE-3 標準才有 EVT 適應症；無 LVO 不宜 IVT',
+    opts: [
+      { main: '有 LVO', val: 'yes' },
+      { main: '無 LVO', val: 'no' },
+    ],
+    next: { yes:'aspects_h924', no:'result_dapt' }
+  },
+
+  aspects_h924: {
+    num: 3, title: 'STEP 3',
+    q: 'ASPECTS？',
+    hint: null,
+    opts: [
+      { main: 'ASPECTS ≥ 6', val: 'high' },
+      { main: 'ASPECTS < 6', sub: '廣泛梗塞，EVT 獲益有限', val: 'low' },
+    ],
+    next: { high:'dawn_h924', low:'result_supportive' }
+  },
+
+  dawn_h924: {
+    num: 4, title: 'STEP 4',
+    q: '符合 DAWN 或 DEFUSE-3 標準？',
+    hint: null,
+    dawn: true,
+    opts: [
+      { main: '符合（任一試驗標準）', val: 'yes' },
+      { main: '不符合', val: 'no' },
+    ],
+    next: { yes:'result_evt_late', no:'result_supportive' }
+  },
+
+  // ── Wake-up branch ──
+  lvo_wakeup: {
+    num: 2, title: 'STEP 2',
+    q: 'LVO 狀態（CTA）',
+    hint: '醒後中風：有 LVO 可考慮 EVT；無 LVO 需 DWI-FLAIR mismatch 判斷 IVT 適合度',
+    opts: [
+      { main: '有 LVO', val: 'yes' },
+      { main: '無 LVO', val: 'no' },
+    ],
+    next: { yes:'aspects_wakeup', no:'flair_wakeup' }
+  },
+
+  aspects_wakeup: {
+    num: 3, title: 'STEP 3',
+    q: 'ASPECTS？',
+    hint: null,
+    opts: [
+      { main: 'ASPECTS ≥ 6', val: 'high' },
+      { main: 'ASPECTS 3 – 5', sub: 'Large core', val: 'mid' },
+      { main: 'ASPECTS < 3', sub: '廣泛梗塞', val: 'low' },
+    ],
+    next: { high:'result_evt_wakeup', mid:'result_evt_wakeup_lc', low:'result_supportive' }
+  },
+
+  flair_wakeup: {
+    num: 3, title: 'STEP 3',
+    q: 'MRI DWI-FLAIR Mismatch？',
+    hint: 'DWI(+) 但 FLAIR(−) → 推測發作 < 4.5h，符合 WAKE-UP trial IVT 標準',
+    opts: [
+      { main: '有 DWI-FLAIR mismatch', sub: 'DWI 陽性，FLAIR 陰性', val: 'yes' },
+      { main: '無 mismatch（FLAIR 已陽性）', sub: '推測發作已 > 4.5h', val: 'no' },
+      { main: '尚未做 MRI', val: 'pending' },
+    ],
+    next: { yes:'result_ivt_wakeup', no:'result_supportive', pending:'result_get_mri' }
+  },
+};
+
+// ── RESULTS ──
+const RESULTS = {
+
+  result_minor: {
+    type: 'yellow', badge: '⚠️ 輕微中風',
+    title: '輕微中風 / TIA — 不建議常規 IVT',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">NIHSS &lt; 4 且無失能，IVT 出血風險超過臨床獲益，<strong>不建議常規給予</strong>。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">💊</span>DAPT：阿斯匹靈 100 mg + clopidogrel 75 mg（各負荷 300 mg），持續 21 天後改單抗</li>
+        <li><span class="act-icon">🧠</span>完整評估：MRI DWI、MRA / CTA、心臟超音波、長期心律監測</li>
+        <li><span class="act-icon">⚡</span>若有 LVO：仍應個別評估 EVT 適合度</li>
+        <li><span class="act-icon">📈</span>積極控制血壓、血糖、LDL-C</li>
+      </ul>
+      <div class="ref-box">POINT / CHANCE trials；2026 AHA/ASA COR 2a</div>`
+  },
+
+  result_ivt_only: {
+    type: 'green', badge: '✅ IVT 建議',
+    title: '靜脈溶栓（IVT）',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">無 LVO，適合單獨 IVT。目標 <strong>door-to-needle ≤ 60 分鐘</strong>。</p>
+      <div class="drug-box">
+        <div class="drug-name">▶ TNK（Tenecteplase）— 優先選擇</div>
+        <div class="drug-dose">0.25 mg/kg  IV push（最大 25 mg）</div>
+        <div class="drug-detail">單次靜脈推注；給藥後可立即移動病人</div>
+      </div>
+      <div class="drug-box">
+        <div class="drug-name alt">▶ Alteplase（替代）</div>
+        <div class="drug-dose">0.9 mg/kg（最大 90 mg）</div>
+        <div class="drug-detail">10% bolus IV push（1 min）+ 剩餘 90% 點滴滴注 60 分鐘</div>
+      </div>
+      <p style="font-size:11.5pt;color:#3fb950;font-weight:700;margin:16px 0 8px;">血壓管理</p>
+      <div class="bp-row">
+        <div class="bp-item"><div class="bp-lbl">給藥前目標</div><div class="bp-val">&lt; 185/110</div><div class="bp-unit">mmHg</div></div>
+        <div class="bp-item"><div class="bp-lbl">給藥後 24 h</div><div class="bp-val">&lt; 180/105</div><div class="bp-unit">mmHg</div></div>
+      </div>
+      <div class="ref-box">AcT / EXTEND-IA TNK；2026 AHA/ASA COR 1A（TNK）、COR 1B（alteplase）</div>`
+  },
+
+  result_ivt_cta: {
+    type: 'green', badge: '✅ IVT 先行，CTA 並行',
+    title: '先給 IVT，同步安排緊急 CTA',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">CTA 尚未完成，但在時間窗內先啟動 IVT，同步安排緊急 CTA/CTP。</p>
+      <div class="drug-box">
+        <div class="drug-name">▶ TNK（Tenecteplase）— 優先</div>
+        <div class="drug-dose">0.25 mg/kg  IV push（最大 25 mg）</div>
+        <div class="drug-detail">給藥後可直接移送 CTA / DSA room</div>
+      </div>
+      <ul class="act-list" style="margin-top:14px;">
+        <li><span class="act-icon">🔍</span>緊急 CTA/CTP：確認 LVO 狀態</li>
+        <li><span class="act-icon">📞</span>確認 LVO → 立即啟動取栓團隊</li>
+        <li><span class="act-icon">⏱️</span>目標 door-to-puncture ≤ 90 分鐘</li>
+      </ul>
+      <div class="bp-row" style="margin-top:14px;">
+        <div class="bp-item"><div class="bp-lbl">給藥前</div><div class="bp-val">&lt; 185/110</div><div class="bp-unit">mmHg</div></div>
+        <div class="bp-item"><div class="bp-lbl">給藥後 24 h</div><div class="bp-val">&lt; 180/105</div><div class="bp-unit">mmHg</div></div>
+      </div>
+      <div class="ref-box">2026 AHA/ASA COR 1A</div>`
+  },
+
+  result_ivt_evt: {
+    type: 'green', badge: '✅ IVT + EVT',
+    title: 'IVT + 機械取栓（EVT）',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">LVO + ASPECTS ≥ 6，最強 EVT 適應症。IVT + EVT 橋接為標準治療。</p>
+      <div class="drug-box">
+        <div class="drug-name">▶ TNK（Tenecteplase）— EVT 前優先選擇</div>
+        <div class="drug-dose">0.25 mg/kg  IV push（最大 25 mg）</div>
+        <div class="drug-detail">給藥後病人可直接移至 DSA room，無需等待點滴完成</div>
+      </div>
+      <ul class="act-list" style="margin-top:14px;">
+        <li><span class="act-icon">⚡</span>立即啟動取栓團隊（Cath lab / Neurointerventional）</li>
+        <li><span class="act-icon">⏱️</span>目標 door-to-puncture ≤ 90 分鐘</li>
+        <li><span class="act-icon">🎯</span>目標 TICI 2b / 3 再通</li>
+      </ul>
+      <p style="font-size:11.5pt;color:#3fb950;font-weight:700;margin:16px 0 8px;">血壓管理</p>
+      <div class="bp-row">
+        <div class="bp-item"><div class="bp-lbl">IVT 前</div><div class="bp-val">&lt; 185/110</div><div class="bp-unit">mmHg</div></div>
+        <div class="bp-item"><div class="bp-lbl">術後（成功再通）</div><div class="bp-val">&lt; 160</div><div class="bp-unit">SBP mmHg</div></div>
+      </div>
+      <div class="ref-box">MR CLEAN / ESCAPE / DAWN / DEFUSE-3；術後 BP：ENCHANTED2；2026 AHA/ASA COR 1A（EVT）、COR 2a（post-EVT SBP &lt;160）</div>`
+  },
+
+  result_ivt_evt_lc: {
+    type: 'blue', badge: '🔵 IVT + EVT Large Core',
+    title: 'IVT + EVT — Large Core（謹慎評估）',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">ASPECTS 3–5 大面積梗塞核心。EVT 證據來自 TESLA / SELECT2 / ANGEL-ASPECT，COR 2a 推薦，出血轉化與功能預後個體差異大。</p>
+      <div class="drug-box">
+        <div class="drug-name">▶ TNK — 優先</div>
+        <div class="drug-dose">0.25 mg/kg  IV push（最大 25 mg）</div>
+      </div>
+      <ul class="act-list" style="margin-top:14px;">
+        <li><span class="act-icon">👨‍⚕️</span>與家屬詳細說明功能恢復預期及症狀性出血轉化風險</li>
+        <li><span class="act-icon">🔍</span>考慮 CTP 確認 penumbra 是否仍有可救組織</li>
+        <li><span class="act-icon">⚡</span>若決定 EVT，立即啟動取栓團隊</li>
+      </ul>
+      <div class="warn-inline">⚠️ TESLA 納入 ASPECTS 3–5；SELECT2 納入至 ASPECTS 3；個別評估整體狀況</div>
+      <div class="bp-row" style="margin-top:12px;">
+        <div class="bp-item"><div class="bp-lbl">術後（成功再通）</div><div class="bp-val">&lt; 160</div><div class="bp-unit">SBP mmHg</div></div>
+      </div>
+      <div class="ref-box">TESLA / SELECT2 / ANGEL-ASPECT；2026 AHA/ASA COR 2a</div>`
+  },
+
+  result_ivt_no_evt: {
+    type: 'yellow', badge: '⚠️ IVT 可考慮，EVT 獲益有限',
+    title: 'ASPECTS < 3 — 廣泛梗塞',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">廣泛梗塞核心，EVT 可能增加出血轉化且功能預後差。時間窗內 IVT 可考慮，但需與家屬充分溝通。</p>
+      <div class="drug-box">
+        <div class="drug-name">▶ IVT（可考慮）</div>
+        <div class="drug-dose">TNK 0.25 mg/kg 或 Alteplase 0.9 mg/kg</div>
+        <div class="drug-detail">獲益有限；依個別臨床情境及家屬意願決定</div>
+      </div>
+      <ul class="act-list" style="margin-top:14px;">
+        <li><span class="act-icon">👨‍⚕️</span>與家屬充分溝通預後及目標導向治療</li>
+        <li><span class="act-icon">🧠</span>考慮 ICU 監測腦水腫及顱內壓升高</li>
+        <li><span class="act-icon">📋</span>適時啟動和緩療護討論</li>
+      </ul>
+      <div class="ref-box">2026 AHA/ASA；ASPECTS &lt;3 EVT 獲益尚無強力試驗支持</div>`
+  },
+
+  result_evt_only: {
+    type: 'blue', badge: '🔵 EVT（IVT 禁忌）',
+    title: '機械取栓（EVT）— 直接取栓',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">IVT 有禁忌，LVO + ASPECTS ≥ 6 仍適合直接 EVT（Direct EVT）。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">⚡</span>立即啟動取栓團隊，不需等待 IVT</li>
+        <li><span class="act-icon">⏱️</span>目標 door-to-puncture ≤ 90 分鐘</li>
+        <li><span class="act-icon">🎯</span>目標 TICI 2b / 3 再通</li>
+      </ul>
+      <div class="bp-row" style="margin-top:14px;">
+        <div class="bp-item"><div class="bp-lbl">術後（成功再通）</div><div class="bp-val">&lt; 160</div><div class="bp-unit">SBP mmHg</div></div>
+      </div>
+      <div class="ref-box">MR CLEAN / DAWN / DEFUSE-3；2026 AHA/ASA COR 1A</div>`
+  },
+
+  result_evt_only_lc: {
+    type: 'blue', badge: '🔵 EVT Large Core（IVT 禁忌）',
+    title: 'EVT Large Core — IVT 禁忌，謹慎評估',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">IVT 禁忌，ASPECTS 3–5，EVT COR 2a，需個別評估。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">👨‍⚕️</span>與家屬說明功能恢復預期及出血轉化風險</li>
+        <li><span class="act-icon">🔍</span>考慮 CTP 確認可救組織</li>
+        <li><span class="act-icon">⚡</span>若決定 EVT，立即啟動</li>
+      </ul>
+      <div class="ref-box">TESLA / SELECT2；2026 AHA/ASA COR 2a</div>`
+  },
+
+  result_evt_h459: {
+    type: 'blue', badge: '🔵 EVT 建議（4.5–9h）',
+    title: 'EVT — 4.5 至 9 小時時間窗',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">LVO + ASPECTS ≥ 6，4.5–9h EVT 適應症明確（COR 1A）。IVT 在此時間窗僅限有 mismatch 者才建議。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">⚡</span>立即啟動取栓團隊</li>
+        <li><span class="act-icon">🔍</span>考慮 CTP：若有 mismatch，可考慮 IVT 橋接（EXTEND-IA TNK）</li>
+        <li><span class="act-icon">⏱️</span>目標 door-to-puncture ≤ 90 分鐘</li>
+      </ul>
+      <div class="bp-row" style="margin-top:14px;">
+        <div class="bp-item"><div class="bp-lbl">術後（成功再通）</div><div class="bp-val">&lt; 160</div><div class="bp-unit">SBP mmHg</div></div>
+      </div>
+      <div class="ref-box">DAWN / DEFUSE-3 / EXTEND-IA TNK；2026 AHA/ASA COR 1A</div>`
+  },
+
+  result_evt_h459_lc: {
+    type: 'blue', badge: '🔵 EVT Large Core（4.5–9h）',
+    title: 'EVT Large Core — 4.5–9h，謹慎評估',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">ASPECTS 3–5，4.5–9h。EVT COR 2a，依個別狀況決定。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">👨‍⚕️</span>與家屬溝通預後</li>
+        <li><span class="act-icon">🔍</span>CTP 確認 penumbra 是否仍存在</li>
+      </ul>
+      <div class="ref-box">TESLA / SELECT2；COR 2a</div>`
+  },
+
+  result_ivt_extend: {
+    type: 'yellow', badge: '🟡 IVT（EXTEND，COR 2a）',
+    title: 'IVT — 4.5–9h，Mismatch 確認',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">無 LVO，有 CTP/DWI mismatch（符合 EXTEND 標準）。IVT COR 2a 推薦。</p>
+      <div class="drug-box">
+        <div class="drug-name alt">▶ Alteplase（EXTEND trial 使用藥物）</div>
+        <div class="drug-dose">0.9 mg/kg（最大 90 mg）</div>
+        <div class="drug-detail">10% bolus IV push（1 min）+ 點滴滴注 60 分鐘<br>TNK 在此時間窗數據尚少，alteplase 為試驗依據</div>
+      </div>
+      <div class="warn-inline">⚠️ 需嚴格符合 EXTEND 標準：Tmax > 6s 體積 ÷ 核心 ≥ 1.2，且 mismatch > 10 mL</div>
+      <div class="ref-box">EXTEND trial（Ma 2019, NEJM）；2026 AHA/ASA COR 2a</div>`
+  },
+
+  result_evt_late: {
+    type: 'blue', badge: '🔵 EVT 建議（DAWN / DEFUSE-3）',
+    title: 'EVT — 9 至 24 小時時間窗',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">符合 DAWN 或 DEFUSE-3 標準，EVT COR 1A 推薦。</p>
+      <div class="dawn-box">
+        <div class="dawn-h">DAWN 標準（6–24h，前循環 LVO）</div>
+        NIHSS ≥ 10，且核心梗塞體積：<br>
+        ・年齡 ≥ 80 歲：核心 ≤ 21 mL<br>
+        ・年齡 &lt; 80 + NIHSS ≥ 10：核心 ≤ 31 mL<br>
+        ・年齡 &lt; 80 + NIHSS ≥ 20：核心 ≤ 51 mL
+      </div>
+      <div class="dawn-box">
+        <div class="dawn-h">DEFUSE-3 標準（6–16h，前循環 LVO）</div>
+        NIHSS ≥ 6，ASPECTS ≥ 6，核心 ≤ 70 mL，<br>
+        mismatch ratio ≥ 1.8 且 mismatch &gt; 15 mL
+      </div>
+      <ul class="act-list" style="margin-top:4px;">
+        <li><span class="act-icon">⚡</span>立即啟動取栓團隊</li>
+        <li><span class="act-icon">🎯</span>目標 TICI 2b / 3 再通</li>
+      </ul>
+      <div class="bp-row" style="margin-top:14px;">
+        <div class="bp-item"><div class="bp-lbl">術後（成功再通）</div><div class="bp-val">&lt; 160</div><div class="bp-unit">SBP mmHg</div></div>
+      </div>
+      <div class="ref-box">DAWN（Nogueira 2018）/ DEFUSE-3（Albers 2018）；2026 AHA/ASA COR 1A</div>`
+  },
+
+  result_evt_wakeup: {
+    type: 'blue', badge: '🔵 EVT（醒後中風，LVO）',
+    title: 'EVT — 醒後中風，LVO 確認',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">LKWT 不明但 LVO 確認，ASPECTS ≥ 6。若影像符合 24h 內發病，EVT 仍適合（COR 1A）。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">⚡</span>立即啟動取栓團隊</li>
+        <li><span class="act-icon">🔍</span>確認 LKWT：以睡前正常時間估算是否在 24h 內</li>
+        <li><span class="act-icon">💊</span>若同時有 DWI-FLAIR mismatch，考慮 IVT 橋接（WAKE-UP trial）</li>
+        <li><span class="act-icon">🎯</span>目標 TICI 2b / 3</li>
+      </ul>
+      <div class="bp-row" style="margin-top:14px;">
+        <div class="bp-item"><div class="bp-lbl">術後（成功再通）</div><div class="bp-val">&lt; 160</div><div class="bp-unit">SBP mmHg</div></div>
+      </div>
+      <div class="ref-box">DAWN / DEFUSE-3；2026 AHA/ASA COR 1A</div>`
+  },
+
+  result_evt_wakeup_lc: {
+    type: 'blue', badge: '🔵 EVT Large Core（醒後中風）',
+    title: 'EVT Large Core — 醒後中風，謹慎評估',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">ASPECTS 3–5，LVO 確認，LKWT 不明。個別評估 EVT 適合度。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">👨‍⚕️</span>與家屬溝通預後</li>
+        <li><span class="act-icon">🔍</span>CTP 確認可救組織</li>
+      </ul>
+      <div class="ref-box">COR 2a；需個別臨床判斷</div>`
+  },
+
+  result_ivt_wakeup: {
+    type: 'yellow', badge: '🟡 IVT（WAKE-UP，COR 2a）',
+    title: 'IVT — 醒後中風，DWI-FLAIR Mismatch',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">DWI-FLAIR mismatch 推測發作 &lt; 4.5h。IVT COR 2a 推薦（WAKE-UP trial）。</p>
+      <div class="drug-box">
+        <div class="drug-name alt">▶ Alteplase（WAKE-UP trial 使用藥物）</div>
+        <div class="drug-dose">0.9 mg/kg（最大 90 mg）</div>
+        <div class="drug-detail">10% bolus + 60 min infusion；TNK 在此情境數據尚少</div>
+      </div>
+      <div class="warn-inline">⚠️ 確認：DWI(+) 且 FLAIR(−)；症狀發現於醒後 4.5h 內；無其他 IVT 禁忌</div>
+      <div class="ref-box">WAKE-UP trial（Thomalla 2018, NEJM）；2026 AHA/ASA COR 2a</div>`
+  },
+
+  result_dapt: {
+    type: 'gray', badge: 'ℹ️ 支持性治療 + DAPT',
+    title: '抗血小板治療 + 支持性照護',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">此情境下 IVT 與 EVT 均不適合，以二級預防和支持性治療為重心。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">💊</span>DAPT：阿斯匹靈 100 mg + clopidogrel 75 mg（各負荷 300 mg），持續 21 天後改單抗</li>
+        <li><span class="act-icon">📈</span>血壓管理（急性期後積極調整）</li>
+        <li><span class="act-icon">🧠</span>完整病因評估（心因性、大動脈硬化、小血管病變）</li>
+        <li><span class="act-icon">🏃</span>早期復健評估轉介</li>
+      </ul>
+      <div class="ref-box">POINT / CHANCE；2026 AHA/ASA</div>`
+  },
+
+  result_supportive: {
+    type: 'gray', badge: 'ℹ️ 支持性治療',
+    title: '支持性治療',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">此情境下血管再通治療獲益有限或不適合，以支持性照護為重心。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">💊</span>抗血小板治療（DAPT 或單抗，依病因）</li>
+        <li><span class="act-icon">📈</span>血壓、血糖（目標 140–180 mg/dL）、體溫（< 37.5°C）控制</li>
+        <li><span class="act-icon">🧠</span>完整病因評估及二級預防</li>
+        <li><span class="act-icon">🏃</span>早期復健轉介</li>
+        <li><span class="act-icon">👨‍⚕️</span>廣泛梗塞者：監測腦水腫及顱內壓，必要時神經外科會診</li>
+      </ul>
+      <div class="ref-box">2026 AHA/ASA</div>`
+  },
+
+  result_get_ctp: {
+    type: 'yellow', badge: '⏳ 需先完成 CTP',
+    title: '需先完成灌流影像（CTP / PWI）',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">4.5–9h 無 LVO，是否給 IVT 需 penumbra/core mismatch 確認。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">🔍</span>緊急安排 CTP 或 PWI/DWI MRI</li>
+        <li><span class="act-icon">📊</span>使用 RAPID 或類似軟體自動分析 mismatch ratio</li>
+        <li><span class="act-icon">⏱️</span>影像完成後 20 分鐘內做出治療決定</li>
+      </ul>
+      <div class="ref-box">EXTEND trial；mismatch 標準：ratio ≥ 1.2 且 mismatch &gt; 10 mL</div>`
+  },
+
+  result_get_mri: {
+    type: 'yellow', badge: '⏳ 需先完成 MRI',
+    title: '需先完成 MRI（DWI + FLAIR）',
+    html: `
+      <p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">醒後中風無 LVO，是否給 IVT 需 DWI-FLAIR mismatch 確認。</p>
+      <ul class="act-list">
+        <li><span class="act-icon">🔍</span>緊急 MRI：DWI + FLAIR 序列（約 10 分鐘）</li>
+        <li><span class="act-icon">📊</span>DWI(+) + FLAIR(−) = 推測發作 &lt; 4.5h → 可考慮 IVT</li>
+        <li><span class="act-icon">⏱️</span>MRI 不應延誤已確認的其他緊急處置</li>
+      </ul>
+      <div class="ref-box">WAKE-UP trial；2026 AHA/ASA</div>`
+  },
+};
+
+// ── STATE ──
+let path  = [];
+let cur   = 'time';
+
+// ── LABEL MAP ──
+const STEP_LABELS = {
+  time:'發作時間', nihss:'NIHSS', ivt_contra:'IVT 禁忌',
+  lvo_lt45:'LVO', lvo_contra:'LVO', aspects_lt45:'ASPECTS', aspects_contra:'ASPECTS',
+  lvo_h459:'LVO', aspects_h459:'ASPECTS', mismatch_h459:'Mismatch',
+  lvo_h924:'LVO', aspects_h924:'ASPECTS', dawn_h924:'DAWN/DEFUSE-3',
+  lvo_wakeup:'LVO', aspects_wakeup:'ASPECTS', flair_wakeup:'DWI-FLAIR',
+};
+
+function getOptMain(stepId, val) {
+  const s = STEPS[stepId]; if (!s) return val;
+  const o = s.opts.find(x => x.val === val);
+  return o ? o.main : val;
+}
+
+function renderCrumbs() {
+  if (!path.length) return '';
+  return '<div class="crumb">' +
+    path.map(p =>
+      `<div class="crumb-item"><span class="crumb-lbl">${STEP_LABELS[p.s]||p.s}</span><span style="color:#555;margin:0 3px">›</span><span class="crumb-val">${getOptMain(p.s,p.v)}</span></div>`
+    ).join('') +
+  '</div>';
+}
+
+function renderNavBtns() {
+  let h = '<div class="nav-btns" style="margin-top:20px;">';
+  if (path.length) h += `<button class="nav-btn" onclick="goBack()">← 上一步</button>`;
+  if (path.length) h += `<button class="nav-btn" onclick="reset()">↺ 重新開始</button>`;
+  h += '</div>';
+  return h;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (cur.startsWith('result_')) { renderResult(app); return; }
+  const step = STEPS[cur];
+  if (!step) { app.innerHTML = `<p style="color:red">Step not found: ${cur}</p>`; return; }
+
+  let h = renderCrumbs();
+  h += `<div class="step-card">`;
+  h += `<div class="step-meta"><div class="step-dot">${step.num}</div><span>${step.title}</span></div>`;
+  h += `<div class="step-q">${step.q}</div>`;
+  if (step.hint) h += `<div class="step-hint">${step.hint}</div>`;
+
+  if (step.chk) {
+    h += `<div class="chk-box"><div class="chk-title">IVT 禁忌症清單（任一項為「有」即有禁忌）：</div><ul class="chk-list">`;
+    step.chk.forEach(c => { h += `<li>${c}</li>`; });
+    h += `</ul></div>`;
+  }
+
+  if (step.dawn) {
+    h += `<div class="dawn-box">
+      <div class="dawn-h">DAWN 標準（6–24h，前循環 LVO）</div>
+      NIHSS ≥ 10，且核心梗塞：年齡 ≥80 → ≤21mL；年齡 &lt;80 NIHSS ≥10 → ≤31mL；年齡 &lt;80 NIHSS ≥20 → ≤51mL
+    </div>
+    <div class="dawn-box">
+      <div class="dawn-h">DEFUSE-3 標準（6–16h，前循環 LVO）</div>
+      NIHSS ≥ 6，ASPECTS ≥ 6，核心 ≤ 70mL，mismatch ratio ≥ 1.8 且 mismatch > 15mL
+    </div>`;
+  }
+
+  h += `<div class="options">`;
+  step.opts.forEach(o => {
+    h += `<button class="opt-btn" onclick="choose('${cur}','${o.val}')">`;
+    h += `<span class="opt-main">${o.main}</span>`;
+    if (o.sub) h += `<span class="opt-sub">${o.sub}</span>`;
+    h += `</button>`;
+  });
+  h += `</div>`;
+  h += renderNavBtns();
+  h += `</div>`;
+
+  app.innerHTML = h;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderResult(app) {
+  const r = RESULTS[cur];
+  if (!r) { app.innerHTML = `<p style="color:red">Result not found: ${cur}</p>`; return; }
+
+  let h = renderCrumbs();
+  h += `<div class="res-card ${r.type}">`;
+  h += `<div class="res-badge">${r.badge}</div>`;
+  h += `<div class="res-title">${r.title}</div>`;
+  h += r.html;
+  h += `</div>`;
+  h += renderNavBtns();
+
+  app.innerHTML = h;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function choose(stepId, val) {
+  path.push({ s: stepId, v: val });
+  cur = STEPS[stepId].next[val];
+  render();
+}
+
+function goBack() {
+  if (!path.length) return;
+  const last = path.pop();
+  cur = last.s;
+  render();
+}
+
+function reset() {
+  path = []; cur = 'time'; render();
+}
+
+render();
+</script>
+</body>
+</html>

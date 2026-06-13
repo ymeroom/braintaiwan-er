@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainTaiwan ER — 急重症神經決策工具</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #0d1117;
+  --surf:   #161b22;
+  --surf2:  #21262d;
+  --border: #30363d;
+  --text:   #e6edf3;
+  --muted:  #8b949e;
+  --ora:    #ff7b2e;
+  --red:    #f85149;
+  --blue:   #58a6ff;
+}
+
+body {
+  font-family: 'Segoe UI','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(135deg,#1a0505 0%,#2d0a0a 55%,#420f0f 100%);
+  border-bottom: 1px solid #5c1c1c;
+  padding: 36px 24px 32px;
+}
+.header-inner { max-width: 860px; margin: 0 auto; }
+.brand { font-size: 11pt; font-weight: 600; color: rgba(255,255,255,0.38); letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 10px; }
+.site-title { font-size: 28pt; font-weight: 700; color: white; line-height: 1.15; }
+.site-sub { font-size: 13pt; color: rgba(255,255,255,0.5); margin-top: 6px; font-weight: 300; }
+.header-nav { display: flex; gap: 8px; margin-top: 22px; flex-wrap: wrap; }
+.nav-a {
+  color: rgba(255,255,255,0.55); text-decoration: none; font-size: 11.5pt;
+  padding: 5px 14px; border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px; transition: all 0.2s;
+}
+.nav-a:hover { background: rgba(255,255,255,0.12); color: white; border-color: rgba(255,255,255,0.4); }
+
+main { max-width: 860px; margin: 0 auto; padding: 36px 24px 72px; }
+
+.sec-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.sec-lbl { font-size: 11pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); white-space: nowrap; }
+.sec-line { flex: 1; height: 1px; background: var(--border); }
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.tool-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; text-decoration: none;
+  color: inherit; display: flex; flex-direction: column;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.tool-card:hover { transform: translateY(-3px); border-color: var(--ora); box-shadow: 0 8px 24px rgba(255,123,46,0.12); }
+.tool-card.soon { opacity: 0.4; pointer-events: none; }
+
+.card-accent { height: 4px; }
+.acc-ora  { background: linear-gradient(90deg,#c41c00,#ff7b2e); }
+.acc-blue { background: linear-gradient(90deg,#0d47a1,#42a5f5); }
+.acc-grn  { background: linear-gradient(90deg,#1b5e20,#43a047); }
+.acc-pur  { background: linear-gradient(90deg,#4a148c,#ab47bc); }
+
+.card-body { padding: 22px; flex: 1; display: flex; flex-direction: column; }
+.card-cat { font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+.card-title { font-size: 16pt; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 8px; }
+.card-desc { font-size: 12pt; color: var(--muted); line-height: 1.6; flex: 1; }
+.card-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
+}
+.tag {
+  display: inline-block; font-size: 10pt; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px; margin-right: 4px;
+}
+.t-ora  { background: rgba(255,123,46,0.15); color: var(--ora); }
+.t-blue { background: rgba(88,166,255,0.15); color: var(--blue); }
+.t-red  { background: rgba(248,81,73,0.15);  color: var(--red); }
+.arrow  { color: var(--ora); font-size: 18pt; font-weight: 300; }
+
+footer {
+  background: var(--surf); border-top: 1px solid var(--border);
+  text-align: center; padding: 22px; font-size: 10.5pt; color: var(--muted);
+  margin-top: 40px; line-height: 1.7;
+}
+footer a { color: var(--muted); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">BrainTaiwan · ER</div>
+    <div class="site-title">急重症神經決策工具</div>
+    <div class="site-sub">Emergency Neurology · 互動式臨床決策輔助</div>
+    <nav class="header-nav">
+      <a href="/" class="nav-a" style="color:var(--ora);border-color:var(--ora);">全部工具</a>
+      <a href="https://md.braintaiwan.com" class="nav-a">臨床資源</a>
+      <a href="https://braintaiwan.com" class="nav-a">首頁</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="sec-hd">
+    <span class="sec-lbl">急性缺血性中風 · Acute Ischemic Stroke</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="tool-grid">
+
+    <a href="ais.html" class="tool-card">
+      <div class="card-accent acc-ora"></div>
+      <div class="card-body">
+        <div class="card-cat">互動決策樹</div>
+        <div class="card-title">AIS 治療決策</div>
+        <div class="card-desc">依時間窗、LVO、ASPECTS 逐步引導至 IVT / EVT / 支持性治療建議，含藥物劑量與血壓目標。</div>
+        <div class="card-foot">
+          <div>
+            <span class="tag t-ora">2026 AHA/ASA</span>
+            <span class="tag t-blue">互動</span>
+          </div>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+    </a>
+
+    <div class="tool-card soon">
+      <div class="card-accent acc-blue"></div>
+      <div class="card-body">
+        <div class="card-cat">評分工具</div>
+        <div class="card-title">NIHSS 快速計算</div>
+        <div class="card-desc">11 個項目逐一評分，自動加總並給出嚴重度分層與臨床意義。</div>
+        <div class="card-foot">
+          <div><span class="tag t-blue">Coming Soon</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool-card soon">
+      <div class="card-accent acc-blue"></div>
+      <div class="card-body">
+        <div class="card-cat">影像判讀</div>
+        <div class="card-title">ASPECTS 評分輔助</div>
+        <div class="card-desc">NCCT / DWI ASPECTS 10 個區域解剖對應、扣分規則與臨床決策門檻。</div>
+        <div class="card-foot">
+          <div><span class="tag t-blue">Coming Soon</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sec-hd" style="margin-top:8px;">
+    <span class="sec-lbl">急性顱內出血 · Intracerebral Hemorrhage</span>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="tool-grid">
+
+    <div class="tool-card soon">
+      <div class="card-accent acc-red" style="background:linear-gradient(90deg,#7f0000,#ef5350);"></div>
+      <div class="card-body">
+        <div class="card-cat">處置決策</div>
+        <div class="card-title">ICH 急性期管理</div>
+        <div class="card-desc">血壓目標、逆轉抗凝、手術適應症（MISTIE / ENRICH 標準），以及 GCS 監測。</div>
+        <div class="card-foot">
+          <div><span class="tag t-red">Coming Soon</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  <strong>⚠️ 免責聲明</strong>：本站工具為臨床決策輔助，不取代個別病人臨床判斷。<br>
+  © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a> ·
+  <a href="https://md.braintaiwan.com">臨床資源</a>
+</footer>
+
+</body>
+</html>
