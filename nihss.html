@@ -22,7 +22,19 @@ header{background:linear-gradient(135deg,#1a0505 0%,#2d0a0a 55%,#420f0f 100%);bo
 .topnav a{color:var(--muted);text-decoration:none;font-size:10.5pt;padding:5px 12px;border-radius:6px;}
 .topnav a:hover{background:var(--surf2);color:var(--text);}
 .topnav .cur{color:var(--ora);font-weight:600;}
+.to-ais{background:var(--ora);color:#0d1117 !important;font-weight:700;border-radius:7px;padding:6px 14px !important;transition:opacity .15s;}
+.to-ais:hover{opacity:.85;background:var(--ora) !important;}
 main{max-width:820px;margin:0 auto;padding:20px 18px 100px;}
+
+/* prominent AIS CTA */
+.ais-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  background:linear-gradient(135deg,#3a1500,#5a2400);border:1.5px solid var(--ora);
+  border-radius:12px;padding:18px 22px;margin:22px 0 8px;text-decoration:none;transition:transform .15s,box-shadow .15s;}
+.ais-cta:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(255,123,46,0.18);}
+.ais-cta-txt{flex:1;min-width:180px;}
+.ais-cta-h{font-size:14pt;font-weight:800;color:var(--ora);}
+.ais-cta-d{font-size:10.5pt;color:rgba(255,255,255,0.7);margin-top:3px;}
+.ais-cta-btn{background:var(--ora);color:#0d1117;font-weight:800;font-size:12pt;padding:11px 20px;border-radius:8px;white-space:nowrap;}
 
 /* sticky score */
 .score-bar{position:sticky;top:0;z-index:20;background:rgba(13,17,23,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:14px 18px;margin:0 -18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
@@ -68,6 +80,7 @@ footer a{color:var(--muted);text-decoration:none;}
   <div class="topnav-inner">
     <a href="/">首頁</a><span style="color:var(--border)">›</span>
     <a href="nihss.html" class="cur">NIHSS</a>
+    <a href="ais.html" class="to-ais" style="margin-left:auto;">→ AIS 治療決策</a>
   </div>
 </nav>
 <main>
@@ -88,6 +101,14 @@ footer a{color:var(--muted);text-decoration:none;}
     <div class="legend-row"><span class="legend-dot" style="background:#ff7b2e"></span>16–20 — 中重度 Moderate–Severe</div>
     <div class="legend-row"><span class="legend-dot" style="background:#f85149"></span>21–42 — 重度 Severe</div>
   </div>
+
+  <a href="ais.html" class="ais-cta">
+    <div class="ais-cta-txt">
+      <div class="ais-cta-h">→ 前往 AIS 治療決策</div>
+      <div class="ais-cta-d">完成 NIHSS 後，依時間窗 / LVO / ASPECTS 決定 IVT / EVT</div>
+    </div>
+    <span class="ais-cta-btn">開始決策 →</span>
+  </a>
 </main>
 <footer>
   <strong>⚠️ 免責聲明</strong>：本計算器為臨床輔助，分數須由受訓人員依標準施測。NIHSS 不取代完整神經學評估。<br>
