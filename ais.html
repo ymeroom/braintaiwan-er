@@ -183,11 +183,32 @@ footer {
 }
 footer a { color: var(--muted); text-decoration: none; }
 
+/* ── 延伸閱讀 CTA ── */
+.read-more { margin-top: 28px; }
+.rm-head {
+  font-size: 12pt; color: var(--muted); text-transform: uppercase;
+  letter-spacing: 1.5px; font-weight: 700; margin-bottom: 14px; text-align: center;
+}
+.rm-grid { display: flex; gap: 14px; flex-wrap: wrap; }
+.rm-card {
+  flex: 1; min-width: 240px; display: flex; align-items: center; gap: 16px;
+  background: var(--blue-dim); border: 1.5px solid #1a3d60; border-radius: 16px;
+  padding: 24px 26px; text-decoration: none;
+  transition: transform .15s, border-color .15s, box-shadow .15s;
+}
+.rm-card:hover { transform: translateY(-3px); border-color: var(--blue); box-shadow: 0 10px 28px rgba(88,166,255,.20); }
+.rm-ico { font-size: 30pt; line-height: 1; flex-shrink: 0; }
+.rm-txt { flex: 1; display: flex; flex-direction: column; }
+.rm-title { font-size: 18pt; font-weight: 800; color: var(--blue); line-height: 1.25; }
+.rm-sub { font-size: 11.5pt; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+.rm-arrow { font-size: 22pt; color: var(--blue); font-weight: 300; }
+
 @media(max-width:600px) {
   .step-q { font-size: 15pt; }
   .res-title { font-size: 17pt; }
   .drug-dose { font-size: 16pt; }
   .step-card, .res-card { padding: 20px 16px; }
+  .rm-title { font-size: 16pt; }
 }
 </style>
 </head>
@@ -211,12 +232,33 @@ footer a { color: var(--muted); text-decoration: none; }
 
 <main>
   <div id="app"></div>
+
+  <div class="read-more">
+    <div class="rm-head">📖 延伸閱讀 · MD 深度資源</div>
+    <div class="rm-grid">
+      <a class="rm-card" href="https://md.braintaiwan.com/ais_infographic.html">
+        <span class="rm-ico">🧠</span>
+        <span class="rm-txt">
+          <span class="rm-title">中風治療決策矩陣</span>
+          <span class="rm-sub">完整時間窗 × IVT / EVT 影像篩選矩陣</span>
+        </span>
+        <span class="rm-arrow">→</span>
+      </a>
+      <a class="rm-card" href="https://md.braintaiwan.com/post_evt_infographic.html">
+        <span class="rm-ico">🩺</span>
+        <span class="rm-txt">
+          <span class="rm-title">Post-EVT 處置</span>
+          <span class="rm-sub">取栓術後血壓 × 抗栓時機 × 監測追蹤</span>
+        </span>
+        <span class="rm-arrow">→</span>
+      </a>
+    </div>
+  </div>
 </main>
 
 <footer>
   <strong>⚠️ 免責聲明</strong>：本工具為臨床決策輔助，不取代個別病人臨床判斷。所有治療決定須依醫師評估執行。<br>
   資料來源：Prabhakaran S et al. <em>2026 Guideline for the Early Management of Patients with AIS.</em> Stroke. 2026.<br>
-  📖 延伸閱讀：<a href="https://md.braintaiwan.com/ais_infographic.html">MD 中風治療決策矩陣</a> · <a href="https://md.braintaiwan.com/post_evt_infographic.html">Post-EVT 處置</a><br>
   © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a>
 </footer>
 
