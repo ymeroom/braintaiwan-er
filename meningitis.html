@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>細菌性腦膜炎 / 腦炎 · 經驗性治療決策 — BrainTaiwan ER</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --bg:#0d1117; --surf:#161b22; --surf2:#21262d; --border:#30363d;
+  --text:#e6edf3; --muted:#8b949e;
+  --red:#f85149; --red-dim:#3d1515; --blue:#58a6ff; --blue-dim:#0d2137;
+  --green:#3fb950; --grn-dim:#0d2e0d; --ylw:#d29922; --ylw-dim:#2e2000;
+  --ora:#ff7b2e; --pur:#bc8cff; --pur-dim:#1c1030;
+}
+body{font-family:'Segoe UI','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+header{background:linear-gradient(135deg,#0a1a2e 0%,#0f2a45 55%,#16405f 100%);border-bottom:1px solid #1c5279;padding:18px 24px;}
+.header-inner{max-width:800px;margin:0 auto;}
+.brand{font-size:10pt;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.tool-title{font-size:22pt;font-weight:700;color:white;line-height:1.2;}
+.tool-sub{font-size:11pt;color:rgba(255,255,255,0.5);margin-top:4px;}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:10px 24px;}
+.topnav-inner{max-width:800px;margin:0 auto;display:flex;gap:6px;align-items:center;}
+.topnav a{color:var(--muted);text-decoration:none;font-size:10.5pt;padding:5px 12px;border-radius:6px;transition:background .15s;}
+.topnav a:hover{background:var(--surf2);color:var(--text);}
+.topnav .cur{color:var(--blue);font-weight:600;}
+main{max-width:800px;margin:0 auto;padding:28px 20px 72px;}
+.phase-bar{display:flex;gap:0;border-radius:8px;overflow:hidden;margin-bottom:22px;border:1px solid var(--border);}
+.phase-seg{flex:1;padding:10px 6px;text-align:center;font-size:10pt;color:var(--muted);background:var(--surf);border-right:1px solid var(--border);line-height:1.3;}
+.phase-seg:last-child{border-right:none;}
+.phase-seg.act{color:white;font-weight:700;}
+.ph-0.act{background:#1b3d5c;color:var(--blue);}
+.ph-1.act{background:#4a2e00;color:var(--ylw);}
+.ph-2.act{background:#1b4d1b;color:var(--green);}
+.ph-3.act{background:#2a0a40;color:var(--pur);}
+.crumb{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.crumb-item{background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:10pt;display:flex;gap:6px;align-items:center;}
+.crumb-lbl{color:var(--muted);} .crumb-val{color:var(--text);font-weight:600;}
+.step-card{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:26px 28px 22px;}
+.step-meta{display:flex;align-items:center;gap:10px;font-size:10pt;color:var(--muted);margin-bottom:10px;}
+.step-dot{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#0d1117;font-size:10pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-q{font-size:17pt;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:8px;}
+.step-hint{font-size:11pt;color:var(--muted);line-height:1.55;margin-bottom:20px;}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.opt-btn{background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;padding:16px 20px;text-align:left;cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;gap:4px;}
+.opt-btn:hover{border-color:var(--blue);background:#0e1722;}
+.opt-main{font-size:14pt;font-weight:600;color:var(--text);}
+.opt-sub{font-size:10.5pt;color:var(--muted);}
+.nav-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.nav-btn{padding:10px 18px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:11pt;transition:all .15s;}
+.nav-btn:hover{border-color:var(--muted);color:var(--text);}
+.cont-btn{padding:12px 22px;background:var(--blue);border:none;border-radius:8px;color:#0d1117;cursor:pointer;font-size:12pt;font-weight:700;transition:opacity .15s;}
+.cont-btn:hover{opacity:.85;}
+.res-card{border-radius:12px;padding:28px;}
+.res-card.green{background:var(--grn-dim);border:1px solid #1a5c1a;}
+.res-card.blue{background:var(--blue-dim);border:1px solid #1a3d60;}
+.res-card.yellow{background:var(--ylw-dim);border:1px solid #4a3800;}
+.res-card.red{background:var(--red-dim);border:1px solid #5a2020;}
+.res-card.purple{background:var(--pur-dim);border:1px solid #3a1860;}
+.res-badge{display:inline-block;font-size:10pt;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;}
+.green .res-badge{background:#174d17;color:var(--green);}
+.blue .res-badge{background:#0a2845;color:var(--blue);}
+.yellow .res-badge{background:#3a2800;color:var(--ylw);}
+.red .res-badge{background:#4a1515;color:var(--red);}
+.purple .res-badge{background:#200840;color:var(--pur);}
+.res-title{font-size:19pt;font-weight:700;color:white;margin-bottom:18px;line-height:1.25;}
+.drug-box{background:rgba(0,0,0,0.35);border-radius:10px;padding:16px 18px;margin:12px 0;}
+.drug-name{font-size:12pt;font-weight:700;color:var(--green);margin-bottom:6px;}
+.drug-name.alt{color:var(--blue);} .drug-name.red{color:var(--red);} .drug-name.pur{color:var(--pur);}
+.drug-dose{font-size:16pt;font-weight:700;color:white;}
+.drug-detail{font-size:11pt;color:var(--muted);margin-top:6px;line-height:1.5;}
+.act-list{list-style:none;margin:10px 0;}
+.act-list li{font-size:12pt;color:var(--text);padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;gap:10px;align-items:flex-start;line-height:1.5;}
+.act-list li:last-child{border-bottom:none;}
+.warn-inline{background:rgba(248,81,73,0.12);border:1px solid rgba(248,81,73,0.3);border-radius:6px;padding:12px 14px;font-size:11.5pt;color:#ff8a82;margin:12px 0;line-height:1.5;}
+.ref-box{margin-top:18px;padding:12px 14px;background:rgba(0,0,0,0.3);border-radius:6px;font-size:10pt;color:var(--muted);line-height:1.5;}
+footer{background:var(--surf);border-top:1px solid var(--border);text-align:center;padding:20px 24px;font-size:10pt;color:var(--muted);margin-top:40px;line-height:1.7;}
+footer a{color:var(--muted);text-decoration:none;}
+@media(max-width:600px){.step-q{font-size:15pt;}.res-title{font-size:16pt;}.step-card,.res-card{padding:20px 16px;}.phase-bar{display:none;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">BrainTaiwan · ER</div>
+    <div class="tool-title">細菌性腦膜炎 / 腦炎</div>
+    <div class="tool-sub">經驗性治療決策 · IDSA Guideline · 不要為了 LP 延誤抗生素</div>
+  </div>
+</header>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="/">首頁</a><span style="color:var(--border)">›</span>
+    <a href="meningitis.html" class="cur">腦膜炎 / 腦炎</a>
+  </div>
+</nav>
+<main><div id="app"></div></main>
+<footer>
+  <strong>⚠️ 免責聲明</strong>：本工具為臨床決策輔助，不取代個別病人臨床判斷。劑量以一般成人腎功能正常為準，須依個別情況調整。<br>
+  資料來源：Tunkel AR et al. IDSA Practice Guidelines for Bacterial Meningitis <em>Clin Infect Dis</em> 2004 ／ HSV encephalitis: Acyclovir empiric therapy<br>
+  © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a>
+</footer>
+<script>
+const PHASES=[
+  {label:'疑診',time:'立即',cls:'ph-0'},
+  {label:'CT / LP 順序',time:'分流',cls:'ph-1'},
+  {label:'抗生素 + 類固醇',time:'ASAP',cls:'ph-2'},
+  {label:'抗病毒 / 後續',time:'同步',cls:'ph-3'},
+];
+const STEPS={
+  suspect:{num:1,title:'STEP 1',phase:0,
+    q:'臨床疑似急性中樞神經感染？',
+    hint:'發燒 + 頭痛 + 頸部僵硬 + 意識改變（典型四聯徵不一定齊全）。出現任一即須積極評估。',
+    opts:[
+      {main:'疑似細菌性腦膜炎 / 腦炎',sub:'發燒、頭痛、頸僵、意識改變、± 抽搐 / 局部神經缺損',val:'cultures'},
+      {main:'臨床不典型，先鑑別',sub:'評估代謝性、出血、其他發燒源',val:'result_ddx'},
+    ],
+    next:{cultures:'cultures',result_ddx:'result_ddx'}
+  },
+  cultures:{num:2,title:'STEP 2',phase:0,
+    q:'立即抽血培養 + 同步準備治療',
+    hint:'血液培養應在抗生素前抽，但「抽培養」與「決定 LP 順序」同時進行，不可延誤治療。',
+    chk:[
+      '兩套血液培養（抗生素前）',
+      'CBC、CRP/PCT、凝血、電解質、血糖、肝腎功能',
+      '評估是否需先做頭部 CT 再 LP（見下一步）',
+      '記錄發病時間與疫苗 / 旅遊 / 免疫狀態史',
+    ],
+    opts:[{main:'已抽培養，評估 CT/LP 順序',val:'ct_before_lp'}],
+    next:{ct_before_lp:'ct_before_lp'}
+  },
+  ct_before_lp:{num:3,title:'STEP 3',phase:1,
+    q:'腰椎穿刺前是否需先做頭部 CT？',
+    hint:'IDSA 指引：出現下列任一危險因子，應先 CT 排除腦疝風險，再做 LP。但無論如何，抗生素不可等待。',
+    opts:[
+      {main:'有以下任一 → 先 CT',sub:'免疫低下／中樞病史／一週內新發抽搐／視乳頭水腫／意識下降／局部神經缺損',val:'result_ct_first'},
+      {main:'皆無 → 可直接 LP',sub:'立即 LP 後給藥',val:'result_lp_first'},
+    ],
+    next:{result_ct_first:'result_ct_first',result_lp_first:'result_lp_first'}
+  },
+  abx_select:{num:4,title:'STEP 4',phase:2,
+    q:'經驗性抗生素 — 依年齡 / 風險選擇',
+    hint:'Dexamethasone 0.15 mg/kg IV 應在「第一劑抗生素前 10–20 分鐘或同時」給予（疑肺炎鏈球菌）。',
+    opts:[
+      {main:'免疫健全成人，< 50 歲',sub:'肺炎鏈球菌、腦膜炎雙球菌為主',val:'result_abx_young'},
+      {main:'> 50 歲 / 免疫低下 / 孕婦 / 酗酒',sub:'須加涵蓋 Listeria',val:'result_abx_listeria'},
+      {main:'醫療照護相關 / 神外術後 / 穿通傷',sub:'須涵蓋 MRSA 與 Pseudomonas',val:'result_abx_nosocomial'},
+    ],
+    next:{result_abx_young:'result_abx_young',result_abx_listeria:'result_abx_listeria',result_abx_nosocomial:'result_abx_nosocomial'}
+  },
+  hsv:{num:5,title:'STEP 5',phase:3,
+    q:'是否疑似病毒性（HSV）腦炎？',
+    hint:'發燒 + 意識/行為改變 + 局部（顳葉）症狀 / 抽搐，CSF 淋巴球增多。疑似即經驗性給 acyclovir，不等 PCR。',
+    opts:[
+      {main:'疑似 HSV 腦炎',sub:'立即經驗性 acyclovir',val:'result_hsv_yes'},
+      {main:'純細菌性表現，無腦炎特徵',sub:'依細菌性流程，安排後續',val:'result_bacterial_only'},
+    ],
+    next:{result_hsv_yes:'result_hsv_yes',result_bacterial_only:'result_bacterial_only'}
+  },
+};
+const RESULTS={
+  result_ddx:{type:'yellow',badge:'🔍 鑑別診斷',title:'先釐清，但勿錯失感染',phase:0,
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">不典型表現仍須警覺中樞感染。同時排除其他急症。</p>
+      <ul class="act-list">
+        <li><span>🧪</span>代謝性（血糖、鈉、肝腎、氨）、毒物</li>
+        <li><span>🩸</span>顱內出血 / SAH（NCCT）</li>
+        <li><span>🌡️</span>全身性感染源（尿、肺、腹）</li>
+        <li><span>⚠️</span>只要無法排除細菌性腦膜炎 → 回到主流程，抽培養並儘速給藥</li>
+      </ul>`},
+  result_ct_first:{type:'red',badge:'🖥️ 先 CT 再 LP',title:'先給藥，CT 後再 LP',phase:1,cont:'abx_select',
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">有腦疝風險因子時，順序為：<strong>血培養 → 立即抗生素 + dexamethasone → 頭部 CT → （安全則）LP</strong>。</p>
+      <ul class="act-list">
+        <li><span>1️⃣</span>血液培養（已完成）</li>
+        <li><span>2️⃣</span><strong>立即</strong>經驗性抗生素 + dexamethasone（見下一步）</li>
+        <li><span>3️⃣</span>頭部 CT 排除佔位 / 腦疝</li>
+        <li><span>4️⃣</span>無禁忌 → LP（培養雖可能受抗生素影響，仍可靠 PCR / 抗原 / 細胞學）</li>
+      </ul>
+      <div class="warn-inline">⚠️ 先給藥不會明顯降低 LP 的診斷價值，但延誤抗生素會增加死亡率。CT 正常 ≠ LP 一定安全，仍須臨床判斷。</div>
+      <div class="ref-box">IDSA 2004 — CT before LP 指徵</div>`},
+  result_lp_first:{type:'green',badge:'💉 直接 LP',title:'立即 LP 後給藥',phase:1,cont:'abx_select',
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">無 CT 前置指徵者：<strong>血培養 → LP（送 CSF）→ 立即抗生素 + dexamethasone</strong>。若 LP 任何延遲，先給藥。</p>
+      <ul class="act-list">
+        <li><span>🧫</span>CSF 送：細胞分類、糖/蛋白、Gram 染色、培養、PCR（含 HSV/腸病毒）、必要時抗原</li>
+        <li><span>🩸</span>對照血糖以判讀 CSF/血糖比值</li>
+        <li><span>⏱️</span>LP 後立即給經驗性抗生素 + dexamethasone</li>
+      </ul>
+      <div class="ref-box">IDSA 2004</div>`},
+  result_abx_young:{type:'green',badge:'💊 經驗性抗生素',title:'免疫健全成人 < 50 歲',phase:2,cont:'hsv',
+    html:`
+      <div class="drug-box"><div class="drug-name">▶ Vancomycin</div>
+        <div class="drug-dose">15–20 mg/kg IV q8–12h</div>
+        <div class="drug-detail">涵蓋抗藥性肺炎鏈球菌 ｜ 監測血中濃度（target trough）</div></div>
+      <div class="drug-box"><div class="drug-name alt">▶ Ceftriaxone</div>
+        <div class="drug-dose">2 g IV q12h</div>
+        <div class="drug-detail">或 cefotaxime 2 g q4–6h ｜ 涵蓋肺炎鏈球菌、腦膜炎雙球菌、流感嗜血桿菌</div></div>
+      <div class="drug-box"><div class="drug-name pur">＋ Dexamethasone</div>
+        <div class="drug-dose">0.15 mg/kg IV q6h × 2–4 天</div>
+        <div class="drug-detail">第一劑抗生素前 10–20 分鐘或同時給 ｜ 確診肺炎鏈球菌才續用</div></div>
+      <div class="ref-box">IDSA 2004 ／ de Gans & van de Beek, NEJM 2002（dexamethasone）</div>`},
+  result_abx_listeria:{type:'green',badge:'💊 經驗性抗生素',title:'> 50 歲 / 免疫低下 — 加 Listeria 涵蓋',phase:2,cont:'hsv',
+    html:`
+      <div class="drug-box"><div class="drug-name">▶ Vancomycin</div>
+        <div class="drug-dose">15–20 mg/kg IV q8–12h</div></div>
+      <div class="drug-box"><div class="drug-name alt">▶ Ceftriaxone</div>
+        <div class="drug-dose">2 g IV q12h</div></div>
+      <div class="drug-box"><div class="drug-name red">＋ Ampicillin（涵蓋 Listeria）</div>
+        <div class="drug-dose">2 g IV q4h</div>
+        <div class="drug-detail">＞50 歲、孕婦、酗酒、細胞免疫低下者必加</div></div>
+      <div class="drug-box"><div class="drug-name pur">＋ Dexamethasone</div>
+        <div class="drug-dose">0.15 mg/kg IV q6h</div>
+        <div class="drug-detail">第一劑抗生素前或同時 ｜ 註：類固醇對 Listeria 效益不確定</div></div>
+      <div class="ref-box">IDSA 2004</div>`},
+  result_abx_nosocomial:{type:'green',badge:'💊 經驗性抗生素',title:'醫療相關 / 術後 / 穿通傷',phase:2,cont:'hsv',
+    html:`
+      <div class="drug-box"><div class="drug-name">▶ Vancomycin</div>
+        <div class="drug-dose">15–20 mg/kg IV q8–12h</div>
+        <div class="drug-detail">涵蓋 MRSA / 凝固酶陰性葡萄球菌</div></div>
+      <div class="drug-box"><div class="drug-name alt">＋ Cefepime / Ceftazidime / Meropenem</div>
+        <div class="drug-dose">Cefepime 2 g q8h ｜ Meropenem 2 g q8h</div>
+        <div class="drug-detail">涵蓋 Pseudomonas 與院內格蘭氏陰性菌</div></div>
+      <div class="warn-inline">⚠️ 有腦室引流 / 分流者考慮移除裝置並送培養；依當地抗藥性調整。</div>
+      <div class="ref-box">IDSA 2017 — Healthcare-Associated Ventriculitis and Meningitis</div>`},
+  result_hsv_yes:{type:'purple',badge:'🦠 疑 HSV 腦炎',title:'立即經驗性 Acyclovir',phase:3,
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">疑似 HSV 腦炎死亡率高，<strong>不要等 PCR 結果</strong>，立即經驗性抗病毒。</p>
+      <div class="drug-box"><div class="drug-name pur">▶ Acyclovir</div>
+        <div class="drug-dose">10 mg/kg IV q8h（依腎功能調整）</div>
+        <div class="drug-detail">充分水化以防腎毒性 ｜ 持續至 HSV PCR 陰性或療程足夠（確診者 14–21 天）</div></div>
+      <ul class="act-list">
+        <li><span>🧫</span>CSF HSV PCR（早期可能偽陰，必要時複驗）</li>
+        <li><span>🧠</span>MRI（顳葉內側 / 邊緣系統異常訊號）支持診斷</li>
+        <li><span>⚡</span>合併抽搐者積極控制；EEG 可見顳葉週期性放電（PLEDs）</li>
+        <li><span>💊</span>細菌性無法排除時，抗生素 + acyclovir 並行</li>
+      </ul>
+      <div class="ref-box">HSV encephalitis — 經驗性 acyclovir 共識</div>`},
+  result_bacterial_only:{type:'blue',badge:'✅ 細菌性流程',title:'依細菌性腦膜炎續行與後續',phase:3,
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">已啟動經驗性抗生素 + dexamethasone，進入監測與降階。</p>
+      <ul class="act-list">
+        <li><span>🧫</span>依 CSF Gram、培養、藥敏結果<strong>降階</strong>為標的治療</li>
+        <li><span>💉</span>確診肺炎鏈球菌 → 續用 dexamethasone（共 2–4 天）；非肺炎鏈球菌可停</li>
+        <li><span>🦠</span>腦膜炎雙球菌 → 通報、密切接觸者預防性投藥</li>
+        <li><span>📊</span>監測意識、抽搐、SIADH / 低血鈉、合併症（聽損、水腦）</li>
+        <li><span>🧠</span>意識惡化 → 影像評估水腦 / 膿瘍 / 靜脈竇栓塞</li>
+      </ul>
+      <div class="ref-box">IDSA 2004</div>`},
+};
+let path=[],cur='suspect';
+const STEP_LABELS={suspect:'疑診',cultures:'培養',ct_before_lp:'CT/LP',abx_select:'抗生素',hsv:'HSV'};
+function getOptLabel(sid,val){const s=STEPS[sid];if(!s)return val;const o=s.opts&&s.opts.find(x=>x.val===val);return o?o.main:val;}
+function renderPhaseBar(a){return '<div class="phase-bar">'+PHASES.map((p,i)=>`<div class="phase-seg ${p.cls}${i===a?' act':''}">${p.label}<br><span style="font-size:9pt;opacity:.75">${p.time}</span></div>`).join('')+'</div>';}
+function renderCrumbs(){if(!path.length)return '';return '<div class="crumb">'+path.map(p=>`<div class="crumb-item"><span class="crumb-lbl">${STEP_LABELS[p.s]||p.s}</span><span style="color:#555;margin:0 3px">›</span><span class="crumb-val">${getOptLabel(p.s,p.v)}</span></div>`).join('')+'</div>';}
+function renderNavBtns(){if(!path.length)return '';return `<div class="nav-btns" style="margin-top:20px;"><button class="nav-btn" onclick="goBack()">← 上一步</button><button class="nav-btn" onclick="reset()">↺ 重新開始</button></div>`;}
+function render(){const app=document.getElementById('app');if(cur.startsWith('result_')){renderResult(app);return;}
+  const step=STEPS[cur];if(!step){app.innerHTML='step?';return;}
+  let h=renderPhaseBar(step.phase??0)+renderCrumbs();
+  h+=`<div class="step-card"><div class="step-meta"><div class="step-dot">${step.num}</div><span>${step.title}</span></div><div class="step-q">${step.q}</div>`;
+  if(step.hint)h+=`<div class="step-hint">${step.hint}</div>`;
+  if(step.chk){h+=`<div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:14px 16px;margin-bottom:16px;"><ul style="list-style:none;">`;step.chk.forEach(c=>{h+=`<li style="font-size:11.5pt;color:#e6edf3;padding:5px 0 5px 22px;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;"><span style="position:absolute;left:0;">☐</span>${c}</li>`;});h+=`</ul></div>`;}
+  h+=`<div class="options">`;step.opts.forEach(o=>{h+=`<button class="opt-btn" onclick="choose('${cur}','${o.val}')"><span class="opt-main">${o.main}</span>${o.sub?`<span class="opt-sub">${o.sub}</span>`:''}</button>`;});h+=`</div>`;
+  h+=renderNavBtns()+`</div>`;app.innerHTML=h;window.scrollTo({top:0,behavior:'smooth'});}
+function renderResult(app){const r=RESULTS[cur];if(!r){app.innerHTML='result?';return;}
+  let h=renderPhaseBar(r.phase??0)+renderCrumbs();
+  h+=`<div class="res-card ${r.type}"><div class="res-badge">${r.badge}</div><div class="res-title">${r.title}</div>${r.html}</div>`;
+  if(r.cont){const lbl=STEP_LABELS[r.cont]||'繼續';h+=`<div class="nav-btns" style="margin-top:16px;"><button class="cont-btn" onclick="advance('${r.cont}')">繼續 → ${lbl}</button></div>`;}
+  h+=renderNavBtns();app.innerHTML=h;window.scrollTo({top:0,behavior:'smooth'});}
+function choose(s,v){path.push({s:s,v:v});cur=STEPS[s].next[v];render();}
+function advance(s){cur=s;render();}
+function goBack(){if(!path.length)return;const last=path[path.length-1];const expected=STEPS[last.s]?STEPS[last.s].next[last.v]:null;if(expected!==cur){cur=expected;render();return;}path.pop();cur=last.s;render();}
+function reset(){path=[];cur='suspect';render();}
+render();
+</script>
+</body>
+</html>

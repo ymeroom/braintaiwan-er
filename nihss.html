@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIHSS 快速計算器 — BrainTaiwan ER</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --bg:#0d1117; --surf:#161b22; --surf2:#21262d; --border:#30363d;
+  --text:#e6edf3; --muted:#8b949e; --ora:#ff7b2e; --blue:#58a6ff;
+  --green:#3fb950; --ylw:#d29922; --red:#f85149;
+}
+body{font-family:'Segoe UI','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+header{background:linear-gradient(135deg,#1a0505 0%,#2d0a0a 55%,#420f0f 100%);border-bottom:1px solid #5c1c1c;padding:18px 24px;}
+.header-inner{max-width:820px;margin:0 auto;}
+.brand{font-size:10pt;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.tool-title{font-size:22pt;font-weight:700;color:white;line-height:1.2;}
+.tool-sub{font-size:11pt;color:rgba(255,255,255,0.5);margin-top:4px;}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:10px 24px;}
+.topnav-inner{max-width:820px;margin:0 auto;display:flex;gap:6px;align-items:center;}
+.topnav a{color:var(--muted);text-decoration:none;font-size:10.5pt;padding:5px 12px;border-radius:6px;}
+.topnav a:hover{background:var(--surf2);color:var(--text);}
+.topnav .cur{color:var(--ora);font-weight:600;}
+main{max-width:820px;margin:0 auto;padding:20px 18px 100px;}
+
+/* sticky score */
+.score-bar{position:sticky;top:0;z-index:20;background:rgba(13,17,23,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:14px 18px;margin:0 -18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.score-num{font-size:30pt;font-weight:800;line-height:1;color:var(--ora);min-width:62px;text-align:center;}
+.score-meta{flex:1;min-width:160px;}
+.score-sev{font-size:14pt;font-weight:700;}
+.score-range{font-size:10pt;color:var(--muted);margin-top:2px;}
+.score-reset{padding:8px 14px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:10.5pt;}
+.score-reset:hover{border-color:var(--muted);color:var(--text);}
+
+.item{background:var(--surf);border:1px solid var(--border);border-radius:11px;padding:16px 18px;margin-bottom:12px;}
+.item-head{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+.item-no{font-size:10pt;font-weight:700;color:var(--ora);background:rgba(255,123,46,0.13);padding:2px 8px;border-radius:5px;}
+.item-name{font-size:13pt;font-weight:700;color:var(--text);}
+.item-hint{font-size:10pt;color:var(--muted);margin-bottom:10px;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:6px;}
+.opt{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all .12s;background:var(--surf2);}
+.opt:hover{border-color:var(--muted);}
+.opt.sel{border-color:var(--ora);background:rgba(255,123,46,0.1);}
+.opt-score{font-size:12pt;font-weight:800;color:var(--muted);min-width:20px;text-align:center;}
+.opt.sel .opt-score{color:var(--ora);}
+.opt-lbl{font-size:11pt;color:var(--text);line-height:1.4;}
+.untested{margin-top:6px;}
+
+.legend{background:var(--surf);border:1px solid var(--border);border-radius:11px;padding:16px 18px;margin-top:8px;}
+.legend h3{font-size:11pt;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;}
+.legend-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:11.5pt;}
+.legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+footer{background:var(--surf);border-top:1px solid var(--border);text-align:center;padding:20px 24px;font-size:10pt;color:var(--muted);margin-top:30px;line-height:1.7;}
+footer a{color:var(--muted);text-decoration:none;}
+@media(max-width:600px){.tool-title{font-size:18pt;}.score-num{font-size:26pt;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">BrainTaiwan · ER</div>
+    <div class="tool-title">NIHSS 快速計算器</div>
+    <div class="tool-sub">National Institutes of Health Stroke Scale · 即時加總與嚴重度分層</div>
+  </div>
+</header>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="/">首頁</a><span style="color:var(--border)">›</span>
+    <a href="nihss.html" class="cur">NIHSS</a>
+  </div>
+</nav>
+<main>
+  <div class="score-bar">
+    <div class="score-num" id="total">0</div>
+    <div class="score-meta">
+      <div class="score-sev" id="sev">尚未開始</div>
+      <div class="score-range" id="prog">已完成 0 / 15 項</div>
+    </div>
+    <button class="score-reset" onclick="resetAll()">↺ 清除</button>
+  </div>
+  <div id="items"></div>
+  <div class="legend">
+    <h3>嚴重度分層</h3>
+    <div class="legend-row"><span class="legend-dot" style="background:#8b949e"></span>0 — 無中風症狀</div>
+    <div class="legend-row"><span class="legend-dot" style="background:#3fb950"></span>1–4 — 輕微 Minor</div>
+    <div class="legend-row"><span class="legend-dot" style="background:#d29922"></span>5–15 — 中度 Moderate</div>
+    <div class="legend-row"><span class="legend-dot" style="background:#ff7b2e"></span>16–20 — 中重度 Moderate–Severe</div>
+    <div class="legend-row"><span class="legend-dot" style="background:#f85149"></span>21–42 — 重度 Severe</div>
+  </div>
+</main>
+<footer>
+  <strong>⚠️ 免責聲明</strong>：本計算器為臨床輔助，分數須由受訓人員依標準施測。NIHSS 不取代完整神經學評估。<br>
+  © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a> ·
+  <a href="ais.html">AIS 決策樹</a>
+</footer>
+<script>
+const ITEMS=[
+  {no:'1a',name:'意識程度 LOC',hint:'即使因插管/語言障礙無法測，仍須依反應評分',
+    opts:[[0,'清醒，反應靈敏'],[1,'嗜睡，輕拍可喚醒並反應'],[2,'木僵，需反覆/強烈刺激才反應'],[3,'昏迷，僅反射或無反應']]},
+  {no:'1b',name:'LOC 問題（月份、年齡）',hint:'問當月月份與年齡，只算第一次回答',
+    opts:[[0,'兩題皆正確'],[1,'一題正確'],[2,'皆錯誤 / 無法回答']]},
+  {no:'1c',name:'LOC 指令（閉眼、握拳）',hint:'請病人睜閉眼、健側手握放',
+    opts:[[0,'兩項皆正確執行'],[1,'一項正確'],[2,'皆無法執行']]},
+  {no:'2',name:'最佳凝視 Gaze',hint:'只測水平眼球運動',
+    opts:[[0,'正常'],[1,'部分凝視麻痺'],[2,'強迫偏斜 / 完全凝視麻痺']]},
+  {no:'3',name:'視野 Visual Fields',hint:'四象限對指數',
+    opts:[[0,'無缺損'],[1,'部分偏盲'],[2,'完全偏盲'],[3,'雙側偏盲 / 全盲']]},
+  {no:'4',name:'顏面麻痺 Facial Palsy',hint:'露齒、閉眼、揚眉',
+    opts:[[0,'正常對稱'],[1,'輕微（鼻唇溝變平、微笑不對稱）'],[2,'部分（下臉明顯癱）'],[3,'完全（上下臉皆癱）']]},
+  {no:'5a',name:'上肢運動 — 左',hint:'手臂抬 90°(坐)/45°(臥) 持續 10 秒',
+    opts:[[0,'無下垂，撐滿 10 秒'],[1,'下垂但未觸床'],[2,'可抗重力但很快落下'],[3,'無法抗重力'],[4,'完全無動作']],untested:true},
+  {no:'5b',name:'上肢運動 — 右',hint:'手臂抬 90°(坐)/45°(臥) 持續 10 秒',
+    opts:[[0,'無下垂，撐滿 10 秒'],[1,'下垂但未觸床'],[2,'可抗重力但很快落下'],[3,'無法抗重力'],[4,'完全無動作']],untested:true},
+  {no:'6a',name:'下肢運動 — 左',hint:'腿抬 30°(臥) 持續 5 秒',
+    opts:[[0,'無下垂，撐滿 5 秒'],[1,'下垂但未觸床'],[2,'可抗重力但很快落下'],[3,'無法抗重力'],[4,'完全無動作']],untested:true},
+  {no:'6b',name:'下肢運動 — 右',hint:'腿抬 30°(臥) 持續 5 秒',
+    opts:[[0,'無下垂，撐滿 5 秒'],[1,'下垂但未觸床'],[2,'可抗重力但很快落下'],[3,'無法抗重力'],[4,'完全無動作']],untested:true},
+  {no:'7',name:'肢體運動失調 Ataxia',hint:'指鼻、跟膝脛；無力時記 0',
+    opts:[[0,'無失調'],[1,'一肢失調'],[2,'兩肢失調']]},
+  {no:'8',name:'感覺 Sensory',hint:'針刺，比較兩側',
+    opts:[[0,'正常'],[1,'輕中度減退'],[2,'重度 / 完全喪失']]},
+  {no:'9',name:'最佳語言 Language',hint:'命名、閱讀、描述圖片',
+    opts:[[0,'正常'],[1,'輕中度失語'],[2,'重度失語'],[3,'啞口 / 完全失語']]},
+  {no:'10',name:'構音障礙 Dysarthria',hint:'唸字評估',
+    opts:[[0,'正常'],[1,'輕中度含糊但可理解'],[2,'重度 / 無法理解 / 啞口']],untested:true},
+  {no:'11',name:'忽略 Extinction / Inattention',hint:'雙側同時刺激',
+    opts:[[0,'無異常'],[1,'單一感官忽略'],[2,'重度半側忽略 / 多感官']]},
+];
+const scores={};
+function render(){
+  const c=document.getElementById('items');let h='';
+  ITEMS.forEach((it,i)=>{
+    h+=`<div class="item"><div class="item-head"><span class="item-no">${it.no}</span><span class="item-name">${it.name}</span></div>`;
+    h+=`<div class="item-hint">${it.hint}</div><div class="opts">`;
+    it.opts.forEach(o=>{const sel=scores[i]===o[0]?' sel':'';h+=`<div class="opt${sel}" onclick="pick(${i},${o[0]})"><span class="opt-score">${o[0]}</span><span class="opt-lbl">${o[1]}</span></div>`;});
+    h+=`</div></div>`;
+  });
+  c.innerHTML=h;update();
+}
+function pick(i,v){scores[i]=v;render();}
+function update(){
+  let total=0,done=0;
+  ITEMS.forEach((it,i)=>{if(scores[i]!==undefined){total+=scores[i];done++;}});
+  document.getElementById('total').textContent=total;
+  document.getElementById('prog').textContent=`已完成 ${done} / 15 項`;
+  const sev=document.getElementById('sev'),num=document.getElementById('total');
+  let label,color;
+  if(done===0){label='尚未開始';color='#8b949e';}
+  else if(total===0){label='0 — 無中風症狀';color='#8b949e';}
+  else if(total<=4){label='輕微 Minor';color='#3fb950';}
+  else if(total<=15){label='中度 Moderate';color='#d29922';}
+  else if(total<=20){label='中重度 Moderate–Severe';color='#ff7b2e';}
+  else{label='重度 Severe';color='#f85149';}
+  sev.textContent=(done<15&&done>0?`${label}（未完成）`:label);
+  sev.style.color=color;num.style.color=color;
+}
+function resetAll(){for(const k in scores)delete scores[k];render();}
+render();
+</script>
+</body>
+</html>

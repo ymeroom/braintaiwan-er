@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>急性脊髓壓迫 / 馬尾症候群 · 決策 — BrainTaiwan ER</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --bg:#0d1117; --surf:#161b22; --surf2:#21262d; --border:#30363d;
+  --text:#e6edf3; --muted:#8b949e;
+  --red:#f85149; --red-dim:#3d1515; --blue:#58a6ff; --blue-dim:#0d2137;
+  --green:#3fb950; --grn-dim:#0d2e0d; --ylw:#d29922; --ylw-dim:#2e2000;
+  --ora:#ff7b2e; --pur:#bc8cff; --pur-dim:#1c1030; --teal:#3fb9ad;
+}
+body{font-family:'Segoe UI','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+header{background:linear-gradient(135deg,#0a2420 0%,#0f3a33 55%,#15564c 100%);border-bottom:1px solid #1c7969;padding:18px 24px;}
+.header-inner{max-width:800px;margin:0 auto;}
+.brand{font-size:10pt;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.tool-title{font-size:22pt;font-weight:700;color:white;line-height:1.2;}
+.tool-sub{font-size:11pt;color:rgba(255,255,255,0.5);margin-top:4px;}
+.topnav{background:var(--surf);border-bottom:1px solid var(--border);padding:10px 24px;}
+.topnav-inner{max-width:800px;margin:0 auto;display:flex;gap:6px;align-items:center;}
+.topnav a{color:var(--muted);text-decoration:none;font-size:10.5pt;padding:5px 12px;border-radius:6px;transition:background .15s;}
+.topnav a:hover{background:var(--surf2);color:var(--text);}
+.topnav .cur{color:var(--teal);font-weight:600;}
+main{max-width:800px;margin:0 auto;padding:28px 20px 72px;}
+.phase-bar{display:flex;gap:0;border-radius:8px;overflow:hidden;margin-bottom:22px;border:1px solid var(--border);}
+.phase-seg{flex:1;padding:10px 6px;text-align:center;font-size:10pt;color:var(--muted);background:var(--surf);border-right:1px solid var(--border);line-height:1.3;}
+.phase-seg:last-child{border-right:none;}
+.phase-seg.act{color:white;font-weight:700;}
+.ph-0.act{background:#4a1515;color:var(--red);}
+.ph-1.act{background:#1b3d5c;color:var(--blue);}
+.ph-2.act{background:#0f3a33;color:var(--teal);}
+.crumb{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.crumb-item{background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:10pt;display:flex;gap:6px;align-items:center;}
+.crumb-lbl{color:var(--muted);} .crumb-val{color:var(--text);font-weight:600;}
+.step-card{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:26px 28px 22px;}
+.step-meta{display:flex;align-items:center;gap:10px;font-size:10pt;color:var(--muted);margin-bottom:10px;}
+.step-dot{width:24px;height:24px;border-radius:50%;background:var(--teal);color:#0d1117;font-size:10pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-q{font-size:17pt;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:8px;}
+.step-hint{font-size:11pt;color:var(--muted);line-height:1.55;margin-bottom:20px;}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.opt-btn{background:var(--surf2);border:1.5px solid var(--border);border-radius:10px;padding:16px 20px;text-align:left;cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;gap:4px;}
+.opt-btn:hover{border-color:var(--teal);background:#0c1a18;}
+.opt-main{font-size:14pt;font-weight:600;color:var(--text);}
+.opt-sub{font-size:10.5pt;color:var(--muted);}
+.nav-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.nav-btn{padding:10px 18px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:11pt;transition:all .15s;}
+.nav-btn:hover{border-color:var(--muted);color:var(--text);}
+.cont-btn{padding:12px 22px;background:var(--teal);border:none;border-radius:8px;color:#0d1117;cursor:pointer;font-size:12pt;font-weight:700;transition:opacity .15s;}
+.cont-btn:hover{opacity:.85;}
+.res-card{border-radius:12px;padding:28px;}
+.res-card.green{background:var(--grn-dim);border:1px solid #1a5c1a;}
+.res-card.blue{background:var(--blue-dim);border:1px solid #1a3d60;}
+.res-card.yellow{background:var(--ylw-dim);border:1px solid #4a3800;}
+.res-card.red{background:var(--red-dim);border:1px solid #5a2020;}
+.res-card.purple{background:var(--pur-dim);border:1px solid #3a1860;}
+.res-badge{display:inline-block;font-size:10pt;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:12px;}
+.green .res-badge{background:#174d17;color:var(--green);}
+.blue .res-badge{background:#0a2845;color:var(--blue);}
+.yellow .res-badge{background:#3a2800;color:var(--ylw);}
+.red .res-badge{background:#4a1515;color:var(--red);}
+.purple .res-badge{background:#200840;color:var(--pur);}
+.res-title{font-size:19pt;font-weight:700;color:white;margin-bottom:18px;line-height:1.25;}
+.drug-box{background:rgba(0,0,0,0.35);border-radius:10px;padding:16px 18px;margin:12px 0;}
+.drug-name{font-size:12pt;font-weight:700;color:var(--green);margin-bottom:6px;}
+.drug-name.alt{color:var(--blue);} .drug-name.red{color:var(--red);} .drug-name.pur{color:var(--pur);}
+.drug-dose{font-size:16pt;font-weight:700;color:white;}
+.drug-detail{font-size:11pt;color:var(--muted);margin-top:6px;line-height:1.5;}
+.act-list{list-style:none;margin:10px 0;}
+.act-list li{font-size:12pt;color:var(--text);padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;gap:10px;align-items:flex-start;line-height:1.5;}
+.act-list li:last-child{border-bottom:none;}
+.warn-inline{background:rgba(248,81,73,0.12);border:1px solid rgba(248,81,73,0.3);border-radius:6px;padding:12px 14px;font-size:11.5pt;color:#ff8a82;margin:12px 0;line-height:1.5;}
+.ref-box{margin-top:18px;padding:12px 14px;background:rgba(0,0,0,0.3);border-radius:6px;font-size:10pt;color:var(--muted);line-height:1.5;}
+footer{background:var(--surf);border-top:1px solid var(--border);text-align:center;padding:20px 24px;font-size:10pt;color:var(--muted);margin-top:40px;line-height:1.7;}
+footer a{color:var(--muted);text-decoration:none;}
+@media(max-width:600px){.step-q{font-size:15pt;}.res-title{font-size:16pt;}.step-card,.res-card{padding:20px 16px;}.phase-bar{display:none;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">BrainTaiwan · ER</div>
+    <div class="tool-title">急性脊髓壓迫 / 馬尾症候群</div>
+    <div class="tool-sub">Cord Compression · Cauda Equina · 時間就是神經功能</div>
+  </div>
+</header>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="/">首頁</a><span style="color:var(--border)">›</span>
+    <a href="cord.html" class="cur">脊髓壓迫 / 馬尾</a>
+  </div>
+</nav>
+<main><div id="app"></div></main>
+<footer>
+  <strong>⚠️ 免責聲明</strong>：本工具為臨床決策輔助，不取代個別病人臨床判斷。手術與類固醇決策須與神經外科 / 腫瘤科 / 放腫科共同評估。<br>
+  資料來源：Patchell RA et al. <em>Lancet</em> 2005（MESCC 手術+放療）／ NICE MSCC Guideline ／ 馬尾症候群減壓時機共識<br>
+  © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a>
+</footer>
+<script>
+const PHASES=[
+  {label:'紅旗篩檢',time:'立即',cls:'ph-0'},
+  {label:'緊急影像',time:'數小時內',cls:'ph-1'},
+  {label:'病因 → 處置',time:'分流',cls:'ph-2'},
+];
+const STEPS={
+  redflag:{num:1,title:'STEP 1',phase:0,
+    q:'紅旗症狀篩檢',
+    hint:'背痛 / 頸痛合併下列任一神經學紅旗，即視為急性脊髓或馬尾壓迫，須緊急處理。',
+    opts:[
+      {main:'有神經學紅旗',sub:'雙側 / 進行性下肢無力、感覺平面、鞍區麻木、大小便功能障礙、步態失調',val:'mri'},
+      {main:'單純背痛、無神經學異常',sub:'無紅旗',val:'result_noflag'},
+    ],
+    next:{mri:'mri',result_noflag:'result_noflag'}
+  },
+  mri:{num:2,title:'STEP 2',phase:1,
+    q:'緊急全脊椎 MRI',
+    hint:'懷疑壓迫即安排緊急 MRI（含全脊椎，因可能多節段）。同時不延誤後續處置決策。',
+    chk:[
+      '緊急「全脊椎」MRI（含 T1/T2 ± 顯影）',
+      'MRI 禁忌或無法即時 → CT 脊髓攝影（CT myelography）',
+      '神經學定位與分級（運動 / 感覺平面、肛門張力、球海綿體反射）',
+      '殘尿量（bladder scan）評估膀胱功能',
+      '已知惡性病史？發燒 / 感染源？外傷史？',
+    ],
+    opts:[{main:'影像確認壓迫，判斷病因',val:'etiology'}],
+    next:{etiology:'etiology'}
+  },
+  etiology:{num:3,title:'STEP 3',phase:2,
+    q:'壓迫病因為何？',
+    hint:'病因決定處置路徑與是否給類固醇。',
+    opts:[
+      {main:'惡性腫瘤轉移（MESCC）',sub:'已知 / 新診斷惡性病，硬膜外轉移',val:'result_mescc'},
+      {main:'急性椎間盤 / 馬尾症候群',sub:'中央型大椎間盤突出壓迫馬尾',val:'result_cauda'},
+      {main:'硬膜外膿瘍 / 感染',sub:'發燒、ESR/CRP 升高、靜脈藥癮 / 菌血症',val:'result_abscess'},
+      {main:'外傷性壓迫',sub:'骨折 / 脫位合併脊髓壓迫',val:'result_trauma'},
+    ],
+    next:{result_mescc:'result_mescc',result_cauda:'result_cauda',result_abscess:'result_abscess',result_trauma:'result_trauma'}
+  },
+};
+const RESULTS={
+  result_noflag:{type:'green',badge:'✅ 無紅旗',title:'無神經學紅旗 — 一般背痛處置',phase:0,
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">無壓迫證據者不需緊急影像，但須衛教回診條件。</p>
+      <ul class="act-list">
+        <li><span>💊</span>症狀治療、活動指導</li>
+        <li><span>🚩</span>衛教紅旗：新發下肢無力、鞍區麻木、大小便障礙 → 立即回診</li>
+        <li><span>🔍</span>夜間痛 / 體重減輕 / 惡性病史 / 發燒 → 仍須進一步檢查排除嚴重病因</li>
+      </ul>`},
+  result_mescc:{type:'red',badge:'🎗️ 惡性轉移 MESCC',title:'立即類固醇 + 緊急放腫 / 神外會診',phase:2,
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">轉移性硬膜外脊髓壓迫（MESCC）是腫瘤急症。<strong>保留行走能力的關鍵在於儘早治療</strong>——可行走者預後遠優於癱瘓者。</p>
+      <div class="drug-box"><div class="drug-name pur">▶ Dexamethasone（立即）</div>
+        <div class="drug-dose">負荷 10 mg IV，之後 4 mg q6h（高度壓迫可用更高劑量方案）</div>
+        <div class="drug-detail">影像確認即可開始 ｜ 減輕水腫、爭取時間 ｜ 留意血糖與腸胃出血</div></div>
+      <ul class="act-list">
+        <li><span>🔪</span><strong>緊急減壓手術 + 術後放療</strong>：單一節段、預期存活佳、可手術者預後最好（Patchell）</li>
+        <li><span>☢️</span><strong>單獨放療</strong>：放射敏感腫瘤、多節段、不適手術或全身狀況差者</li>
+        <li><span>🤝</span>同時會診神經外科、放射腫瘤科、腫瘤科共同決策</li>
+        <li><span>🧪</span>未知原發 → 安排組織診斷與分期，但不延誤減壓</li>
+      </ul>
+      <div class="warn-inline">⏱️ 時間窗：神經功能惡化越久越難回復；理想在出現運動缺損的 24–48 小時內處置。</div>
+      <div class="ref-box">Patchell RA et al. Lancet 2005 ／ NICE MSCC Guideline</div>`},
+  result_cauda:{type:'red',badge:'🔪 馬尾症候群',title:'緊急手術減壓',phase:2,
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">急性馬尾症候群（CES）是<strong>外科急症</strong>。中央型大椎間盤突出壓迫馬尾，延遲減壓與永久性大小便 / 性功能障礙相關。</p>
+      <ul class="act-list">
+        <li><span>🔪</span><strong>緊急神經外科減壓</strong>——目標儘早，常建議 24–48 小時內（越早越好）</li>
+        <li><span>🚽</span>記錄括約肌功能、鞍區感覺、殘尿——作為基準與預後指標</li>
+        <li><span>💧</span>尿滯留者導尿；勿因等待而延誤手術評估</li>
+        <li><span>📞</span>立即神經外科 / 骨科脊椎會診</li>
+      </ul>
+      <div class="warn-inline">⚠️ 退化性椎間盤造成的 CES 一般<strong>不</strong>常規給高劑量類固醇（與 MESCC 不同）。</div>
+      <div class="ref-box">馬尾症候群緊急減壓共識</div>`},
+  result_abscess:{type:'yellow',badge:'🦠 硬膜外膿瘍',title:'抗生素 + 手術減壓引流',phase:2,
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">脊椎硬膜外膿瘍：感染 + 壓迫雙重急症。處置以<strong>手術減壓引流 + 抗生素</strong>為主。</p>
+      <ul class="act-list">
+        <li><span>🧫</span>血液培養（給藥前）；可能時取得膿液 / 組織培養</li>
+        <li><span>💊</span>經驗性抗生素涵蓋 <strong>金黃色葡萄球菌（含 MRSA）</strong>：如 vancomycin ＋ 第三/四代 cephalosporin</li>
+        <li><span>🔪</span>有神經學缺損 / 壓迫 → 緊急手術減壓引流</li>
+        <li><span>🚫</span>不常規給類固醇（除非另有指徵）</li>
+      </ul>
+      <div class="ref-box">脊椎硬膜外膿瘍處置原則</div>`},
+  result_trauma:{type:'blue',badge:'🦴 外傷性',title:'固定 + 神外評估',phase:2,
+    html:`<p style="font-size:13pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">外傷性脊髓壓迫：優先脊椎固定、維持灌流，神經外科評估手術時機。</p>
+      <ul class="act-list">
+        <li><span>🧍</span>脊椎固定（頸圈 / 軸線翻身），避免二次傷害</li>
+        <li><span>🩸</span>維持血壓 / 氧合，避免脊髓二次缺血（MAP 目標依情況）</li>
+        <li><span>🔪</span>不穩定骨折 / 進行性壓迫 → 神經外科手術固定減壓</li>
+        <li><span>💊</span>外傷性脊髓損傷的高劑量類固醇有爭議，須個別化、與神外討論</li>
+      </ul>
+      <div class="ref-box">脊髓外傷處置原則</div>`},
+};
+let path=[],cur='redflag';
+const STEP_LABELS={redflag:'紅旗',mri:'影像',etiology:'病因'};
+function getOptLabel(sid,val){const s=STEPS[sid];if(!s)return val;const o=s.opts&&s.opts.find(x=>x.val===val);return o?o.main:val;}
+function renderPhaseBar(a){return '<div class="phase-bar">'+PHASES.map((p,i)=>`<div class="phase-seg ${p.cls}${i===a?' act':''}">${p.label}<br><span style="font-size:9pt;opacity:.75">${p.time}</span></div>`).join('')+'</div>';}
+function renderCrumbs(){if(!path.length)return '';return '<div class="crumb">'+path.map(p=>`<div class="crumb-item"><span class="crumb-lbl">${STEP_LABELS[p.s]||p.s}</span><span style="color:#555;margin:0 3px">›</span><span class="crumb-val">${getOptLabel(p.s,p.v)}</span></div>`).join('')+'</div>';}
+function renderNavBtns(){if(!path.length)return '';return `<div class="nav-btns" style="margin-top:20px;"><button class="nav-btn" onclick="goBack()">← 上一步</button><button class="nav-btn" onclick="reset()">↺ 重新開始</button></div>`;}
+function render(){const app=document.getElementById('app');if(cur.startsWith('result_')){renderResult(app);return;}
+  const step=STEPS[cur];if(!step){app.innerHTML='step?';return;}
+  let h=renderPhaseBar(step.phase??0)+renderCrumbs();
+  h+=`<div class="step-card"><div class="step-meta"><div class="step-dot">${step.num}</div><span>${step.title}</span></div><div class="step-q">${step.q}</div>`;
+  if(step.hint)h+=`<div class="step-hint">${step.hint}</div>`;
+  if(step.chk){h+=`<div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:14px 16px;margin-bottom:16px;"><ul style="list-style:none;">`;step.chk.forEach(c=>{h+=`<li style="font-size:11.5pt;color:#e6edf3;padding:5px 0 5px 22px;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;"><span style="position:absolute;left:0;">☐</span>${c}</li>`;});h+=`</ul></div>`;}
+  h+=`<div class="options">`;step.opts.forEach(o=>{h+=`<button class="opt-btn" onclick="choose('${cur}','${o.val}')"><span class="opt-main">${o.main}</span>${o.sub?`<span class="opt-sub">${o.sub}</span>`:''}</button>`;});h+=`</div>`;
+  h+=renderNavBtns()+`</div>`;app.innerHTML=h;window.scrollTo({top:0,behavior:'smooth'});}
+function renderResult(app){const r=RESULTS[cur];if(!r){app.innerHTML='result?';return;}
+  let h=renderPhaseBar(r.phase??0)+renderCrumbs();
+  h+=`<div class="res-card ${r.type}"><div class="res-badge">${r.badge}</div><div class="res-title">${r.title}</div>${r.html}</div>`;
+  if(r.cont){const lbl=STEP_LABELS[r.cont]||'繼續';h+=`<div class="nav-btns" style="margin-top:16px;"><button class="cont-btn" onclick="advance('${r.cont}')">繼續 → ${lbl}</button></div>`;}
+  h+=renderNavBtns();app.innerHTML=h;window.scrollTo({top:0,behavior:'smooth'});}
+function choose(s,v){path.push({s:s,v:v});cur=STEPS[s].next[v];render();}
+function advance(s){cur=s;render();}
+function goBack(){if(!path.length)return;const last=path[path.length-1];const expected=STEPS[last.s]?STEPS[last.s].next[last.v]:null;if(expected!==cur){cur=expected;render();return;}path.pop();cur=last.s;render();}
+function reset(){path=[];cur='redflag';render();}
+render();
+</script>
+</body>
+</html>
