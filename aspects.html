@@ -25,7 +25,6 @@ header{background:linear-gradient(135deg,#1a0505 0%,#2d0a0a 55%,#420f0f 100%);bo
 .to-ais{background:var(--ora);color:#0d1117 !important;font-weight:700;border-radius:7px;padding:6px 14px !important;transition:opacity .15s;}
 .to-ais:hover{opacity:.85;background:var(--ora) !important;}
 main{max-width:880px;margin:0 auto;padding:20px 18px 100px;}
-
 .score-bar{position:sticky;top:0;z-index:20;background:rgba(13,17,23,0.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:14px 18px;margin:0 -18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
 .score-num{font-size:30pt;font-weight:800;line-height:1;color:var(--green);min-width:74px;text-align:center;}
 .score-num small{font-size:13pt;color:var(--muted);font-weight:600;}
@@ -34,25 +33,20 @@ main{max-width:880px;margin:0 auto;padding:20px 18px 100px;}
 .score-range{font-size:10pt;color:var(--muted);margin-top:3px;}
 .score-reset{padding:8px 14px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:10.5pt;}
 .score-reset:hover{border-color:var(--muted);color:var(--text);}
-
 .intro{font-size:11.5pt;color:var(--muted);line-height:1.65;margin-bottom:16px;background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:14px 18px;}
 .intro b{color:var(--text);}
 
-/* ── brain diagram ── */
-.diagram{background:#06080c;border:1px solid var(--border);border-radius:14px;padding:10px 8px 4px;margin-bottom:8px;}
-.diagram svg{width:100%;height:auto;display:block;}
-.diag-cap{text-align:center;font-size:10pt;color:var(--muted);padding:6px 0 8px;}
-.skull-outer{fill:none;stroke:#6b7280;stroke-width:3;}
-.skull-inner{fill:none;stroke:#4b5563;stroke-width:1.6;}
-.vent{fill:none;stroke:#6b7280;stroke-width:1.8;}
-.axis-lbl{fill:var(--teal);font-weight:800;font-size:21px;letter-spacing:1px;}
-.region-zone{fill:rgba(43,212,189,0.08);stroke:var(--teal);stroke-width:2;cursor:pointer;transition:fill .12s,stroke .12s;}
-.region:hover .region-zone{fill:rgba(43,212,189,0.20);}
-.region.hit .region-zone{fill:rgba(248,81,73,0.42);stroke:var(--red);stroke-width:2.5;}
-.region-label{fill:var(--teal);font-weight:800;font-size:24px;pointer-events:none;}
-.region.hit .region-label{fill:#ff9a92;}
-.region-x{fill:#fff;font-weight:800;font-size:20px;pointer-events:none;opacity:0;}
-.region.hit .region-x{opacity:1;}
+/* image + hotspots */
+.diagram{position:relative;width:100%;border:1px solid var(--border);border-radius:14px;overflow:hidden;line-height:0;background:#000;}
+.diagram img{width:100%;display:block;}
+.hot{position:absolute;width:9%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);
+  border:2.5px solid rgba(43,212,189,0.55);background:rgba(43,212,189,0.06);cursor:pointer;
+  transition:all .12s;display:flex;align-items:center;justify-content:center;}
+.hot:hover{background:rgba(43,212,189,0.20);border-color:var(--teal);}
+.hot.hit{background:rgba(248,81,73,0.45);border-color:var(--red);box-shadow:0 0 0 3px rgba(248,81,73,0.25);}
+.hot .x{color:#fff;font-weight:800;font-size:clamp(12px,2.4vw,22px);opacity:0;}
+.hot.hit .x{opacity:1;}
+.diag-cap{font-size:10pt;color:var(--muted);text-align:center;margin:8px 0 16px;line-height:1.5;padding-top:8px;}
 
 .ref-list{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:8px;font-size:10.5pt;color:var(--muted);line-height:1.9;}
 .ref-list b{color:var(--text);}
@@ -75,7 +69,7 @@ main{max-width:880px;margin:0 auto;padding:20px 18px 100px;}
 
 footer{background:var(--surf);border-top:1px solid var(--border);text-align:center;padding:20px 24px;font-size:10pt;color:var(--muted);margin-top:30px;line-height:1.7;}
 footer a{color:var(--muted);text-decoration:none;}
-@media(max-width:600px){.tool-title{font-size:18pt;}.score-num{font-size:26pt;}.region-label{font-size:27px;}.axis-lbl{font-size:22px;}}
+@media(max-width:600px){.tool-title{font-size:18pt;}.score-num{font-size:26pt;}}
 </style>
 </head>
 <body>
@@ -104,110 +98,24 @@ footer a{color:var(--muted);text-decoration:none;}
   </div>
 
   <div class="intro">
-    從 <b>10 分</b>起算，於單側 MCA 供血區的 <b>10 個區域</b>中，每有<b>一區出現早期缺血變化</b>（灰白質界線消失、皮質腫脹、低密度）即<b>扣 1 分</b>。<b>直接點選下方腦切面圖</b>中受影響的區域。
+    從 <b>10 分</b>起算，於單側 MCA 供血區的 <b>10 個區域</b>中，每有<b>一區出現早期缺血變化</b>（灰白質界線消失、皮質腫脹、低密度）即<b>扣 1 分</b>。<b>直接點選下方腦切面圖</b>中受影響的區域（圈圈）。
   </div>
 
-  <div class="diagram">
-    <svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" aria-label="ASPECTS 腦切面分區圖">
-      <!-- axis labels -->
-      <text class="axis-lbl" x="500" y="26" text-anchor="middle">ANTERIOR</text>
-      <text class="axis-lbl" x="500" y="552" text-anchor="middle">POSTERIOR</text>
-
-      <!-- ══ GANGLIONIC SLICE (left) ══ -->
-      <g>
-        <ellipse class="skull-outer" cx="255" cy="285" rx="215" ry="250"/>
-        <ellipse class="skull-inner" cx="255" cy="285" rx="198" ry="232"/>
-        <!-- lateral ventricles (schematic butterfly) -->
-        <path class="vent" d="M255 175 C220 215 210 270 240 320 C250 360 255 400 255 430
-                              C255 400 260 360 270 320 C300 270 290 215 255 175 Z"/>
-        <line class="vent" x1="255" y1="175" x2="255" y2="430"/>
-      </g>
-
-      <!-- deep structures (patient left = image right side) -->
-      <g class="region" id="g-C" onclick="toggle('C')">
-        <ellipse class="region-zone" cx="300" cy="232" rx="30" ry="24"/>
-        <text class="region-label" x="300" y="240" text-anchor="middle">C</text>
-        <text class="region-x" x="328" y="214" text-anchor="middle">✕</text>
-      </g>
-      <g class="region" id="g-IC" onclick="toggle('IC')">
-        <ellipse class="region-zone" cx="312" cy="300" rx="20" ry="38" transform="rotate(18 312 300)"/>
-        <text class="region-label" x="306" y="308" text-anchor="middle">IC</text>
-        <text class="region-x" x="332" y="276" text-anchor="middle">✕</text>
-      </g>
-      <g class="region" id="g-L" onclick="toggle('L')">
-        <ellipse class="region-zone" cx="352" cy="288" rx="28" ry="36"/>
-        <text class="region-label" x="352" y="296" text-anchor="middle">L</text>
-        <text class="region-x" x="376" y="262" text-anchor="middle">✕</text>
-      </g>
-      <g class="region" id="g-I" onclick="toggle('I')">
-        <ellipse class="region-zone" cx="396" cy="282" rx="13" ry="44"/>
-        <text class="region-label" x="396" y="290" text-anchor="middle">I</text>
-        <text class="region-x" x="396" y="232" text-anchor="middle">✕</text>
-      </g>
-      <!-- cortical MCA -->
-      <g class="region" id="g-M1" onclick="toggle('M1')">
-        <ellipse class="region-zone" cx="338" cy="168" rx="42" ry="38"/>
-        <text class="region-label" x="338" y="176" text-anchor="middle">M1</text>
-        <text class="region-x" x="372" y="142" text-anchor="middle">✕</text>
-      </g>
-      <g class="region" id="g-M2" onclick="toggle('M2')">
-        <ellipse class="region-zone" cx="432" cy="290" rx="32" ry="56"/>
-        <text class="region-label" x="432" y="298" text-anchor="middle">M2</text>
-        <text class="region-x" x="432" y="240" text-anchor="middle">✕</text>
-      </g>
-      <g class="region" id="g-M3" onclick="toggle('M3')">
-        <ellipse class="region-zone" cx="348" cy="406" rx="46" ry="40"/>
-        <text class="region-label" x="348" y="414" text-anchor="middle">M3</text>
-        <text class="region-x" x="384" y="382" text-anchor="middle">✕</text>
-      </g>
-
-      <!-- ══ SUPRAGANGLIONIC SLICE (right) ══ -->
-      <g>
-        <ellipse class="skull-outer" cx="745" cy="285" rx="215" ry="250"/>
-        <ellipse class="skull-inner" cx="745" cy="285" rx="198" ry="232"/>
-        <!-- slit-like lateral ventricles -->
-        <ellipse class="vent" cx="710" cy="285" rx="11" ry="78"/>
-        <ellipse class="vent" cx="780" cy="285" rx="11" ry="78"/>
-      </g>
-      <g class="region" id="g-M4" onclick="toggle('M4')">
-        <ellipse class="region-zone" cx="828" cy="180" rx="46" ry="40"/>
-        <text class="region-label" x="828" y="188" text-anchor="middle">M4</text>
-        <text class="region-x" x="864" y="154" text-anchor="middle">✕</text>
-      </g>
-      <g class="region" id="g-M5" onclick="toggle('M5')">
-        <ellipse class="region-zone" cx="892" cy="288" rx="34" ry="60"/>
-        <text class="region-label" x="892" y="296" text-anchor="middle">M5</text>
-        <text class="region-x" x="892" y="234" text-anchor="middle">✕</text>
-      </g>
-      <g class="region" id="g-M6" onclick="toggle('M6')">
-        <ellipse class="region-zone" cx="832" cy="398" rx="48" ry="42"/>
-        <text class="region-label" x="832" y="406" text-anchor="middle">M6</text>
-        <text class="region-x" x="870" y="374" text-anchor="middle">✕</text>
-      </g>
-    </svg>
-    <div class="diag-cap">左：神經節層（基底節 / 視丘層面）　·　右：神經節上層（側腦室體部上方）　—　點選區域切換</div>
+  <div class="diagram" id="diagram">
+    <img src="aspects-ref.png" alt="ASPECTS 腦切面分區圖">
   </div>
+  <div class="diag-cap">左：神經節層（基底節 / 視丘層面）　·　右：神經節上層（側腦室體部上方）　—　點擊圈圈切換受影響狀態</div>
 
   <div class="ref-list">
     <span class="grp">深部結構：</span>
-    <b>C</b> 尾狀核 ·
-    <b>L</b> 豆狀核 ·
-    <b>IC</b> 內囊 ·
-    <b>I</b> 腦島帶<br>
+    <b>C</b> 尾狀核 · <b>L</b> 豆狀核 · <b>IC</b> 內囊 · <b>I</b> 腦島帶<br>
     <span class="grp">皮質（神經節層）：</span>
-    <b>M1</b> 前 MCA ·
-    <b>M2</b> 腦島外側 MCA ·
-    <b>M3</b> 後 MCA<br>
+    <b>M1</b> 前 MCA · <b>M2</b> 腦島外側 MCA · <b>M3</b> 後 MCA<br>
     <span class="grp">皮質（上層）：</span>
-    <b>M4</b> 前 ·
-    <b>M5</b> 外側 ·
-    <b>M6</b> 後
+    <b>M4</b> 前 · <b>M5</b> 外側 · <b>M6</b> 後
   </div>
 
-  <div class="result-card" id="result">
-    <h3 id="r-title">—</h3>
-    <p id="r-body">尚未評分。</p>
-  </div>
+  <div class="result-card" id="result"><h3 id="r-title">—</h3><p id="r-body">尚未評分。</p></div>
 
   <a href="ais.html" class="ais-cta">
     <div class="ais-cta-txt">
@@ -218,21 +126,33 @@ footer a{color:var(--muted);text-decoration:none;}
   </a>
 </main>
 <footer>
-  <strong>⚠️ 免責聲明</strong>：本工具為臨床輔助，ASPECTS 須由受訓醫師於標準影像判讀；治療決策應整合臨床、灌流影像與時間窗。分區圖為示意，非精確解剖。<br>
+  <strong>⚠️ 免責聲明</strong>：本工具為臨床輔助，ASPECTS 須由受訓醫師於標準影像判讀；治療決策應整合臨床、灌流影像與時間窗。<br>
   資料來源：Barber PA et al. <em>Lancet</em> 2000 ／ 2026 AHA/ASA AIS Guideline<br>
   © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a> ·
   <a href="ais.html">AIS 決策樹</a>
 </footer>
 <script>
-const CODES=['C','L','IC','I','M1','M2','M3','M4','M5','M6'];
+// 熱區位置（% of image width / height），對應原圖各標籤
+const HOTS=[
+  {c:'M1',x:35,y:26},{c:'C',x:28.5,y:40},{c:'L',x:33,y:47.5},{c:'I',x:37,y:47},
+  {c:'IC',x:28.5,y:53.5},{c:'M2',x:41.5,y:53},{c:'M3',x:38.5,y:71},
+  {c:'M4',x:76.5,y:19},{c:'M5',x:91,y:52},{c:'M6',x:87.5,y:75.5},
+];
 const hit={};
-function toggle(code){hit[code]=!hit[code];update();}
+function build(){
+  const d=document.getElementById('diagram');
+  HOTS.forEach(h=>{
+    const el=document.createElement('div');
+    el.className='hot';el.id='h-'+h.c;el.style.left=h.x+'%';el.style.top=h.y+'%';
+    el.title=h.c;el.onclick=()=>toggle(h.c);
+    el.innerHTML='<span class="x">✕</span>';
+    d.appendChild(el);
+  });
+}
+function toggle(c){hit[c]=!hit[c];update();}
 function update(){
   let n=0;
-  CODES.forEach(c=>{
-    const g=document.getElementById('g-'+c);
-    if(hit[c]){n++;g.classList.add('hit');}else{g.classList.remove('hit');}
-  });
+  HOTS.forEach(h=>{const el=document.getElementById('h-'+h.c);if(hit[h.c]){n++;el.classList.add('hit');}else el.classList.remove('hit');});
   const score=10-n;
   document.getElementById('total').innerHTML=score+'<small>/10</small>';
   document.getElementById('cnt').textContent=`受影響區域：${n}`;
@@ -253,8 +173,8 @@ function update(){
   }
   sev.textContent=label;sev.style.color=color;num.style.color=color;
 }
-function resetAll(){CODES.forEach(c=>delete hit[c]);update();}
-update();
+function resetAll(){for(const k in hit)delete hit[k];update();}
+build();update();
 </script>
 </body>
 </html>
