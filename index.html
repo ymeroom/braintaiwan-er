@@ -107,6 +107,12 @@ footer {
   margin-top: 40px; line-height: 1.7;
 }
 footer a { color: var(--muted); text-decoration: none; }
+footer .subscribe-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  margin: 10px 0 4px; padding: 6px 12px; border-radius: 18px;
+  border: 1px solid rgba(255,123,46,0.45); color: var(--ora);
+}
+footer .subscribe-link:hover { background: rgba(255,123,46,0.1); color: #ff9b5e; }
 </style>
 </head>
 <body>
@@ -121,6 +127,7 @@ footer a { color: var(--muted); text-decoration: none; }
       <a href="https://md.braintaiwan.com" class="nav-a">臨床 MD</a>
       <a href="/" class="nav-a" style="color:var(--ora);border-color:var(--ora);">急重症 ER</a>
       <a href="https://media.braintaiwan.com" class="nav-a">衛教 Media</a>
+      <a href="https://media.braintaiwan.com/subscribe.html" class="nav-a">訂閱</a>
     </nav>
   </div>
 </header>
@@ -288,6 +295,7 @@ footer a { color: var(--muted); text-decoration: none; }
 
 <footer>
   <strong>⚠️ 免責聲明</strong>：本站工具為臨床決策輔助，不取代個別病人臨床判斷。<br>
+  <a class="subscribe-link" href="https://media.braintaiwan.com/subscribe.html">訂閱 ER 工具更新</a><br>
   © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a> ·
   <a href="https://md.braintaiwan.com">臨床資源</a> · <a href="https://www.facebook.com/FBbraintaiwan" target="_blank" rel="noopener">Facebook</a>
 </footer>
