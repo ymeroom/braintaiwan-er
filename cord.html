@@ -76,6 +76,12 @@ main{max-width:800px;margin:0 auto;padding:28px 20px 72px;}
 footer{background:var(--surf);border-top:1px solid var(--border);text-align:center;padding:20px 24px;font-size:11pt;color:var(--muted);margin-top:40px;line-height:1.7;}
 footer a{color:var(--muted);text-decoration:none;}
 @media(max-width:600px){.step-q{font-size:15pt;}.res-title{font-size:16pt;}.step-card,.res-card{padding:20px 16px;}.phase-bar{display:none;}}
+.tool-meta{max-width:800px;margin:16px auto 0;padding:0 20px}
+.tool-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tool-meta-item{background:rgba(22,27,34,.92);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.tool-meta-k{font-size:9.5pt;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ora);margin-bottom:5px}
+.tool-meta-v{font-size:10.5pt;line-height:1.5;color:var(--muted)}
+@media(max-width:720px){.tool-meta-grid{grid-template-columns:1fr}.tool-meta{padding:0 18px}}
 </style>
 </head>
 <body>
@@ -92,6 +98,23 @@ footer a{color:var(--muted);text-decoration:none;}
     <a href="cord.html" class="cur">脊髓壓迫 / 馬尾</a>
   </div>
 </nav>
+<!-- bt-tool-meta -->
+<section class="tool-meta" aria-label="工具版本與資料來源">
+  <div class="tool-meta-grid">
+    <div class="tool-meta-item">
+      <div class="tool-meta-k">適用對象</div>
+      <div class="tool-meta-v">急診、腫瘤、神經科與神經外科團隊；用於脊髓壓迫或馬尾症候群警訊分流。</div>
+    </div>
+    <div class="tool-meta-item">
+      <div class="tool-meta-k">最後更新</div>
+      <div class="tool-meta-v">2026.06</div>
+    </div>
+    <div class="tool-meta-item">
+      <div class="tool-meta-k">資料來源</div>
+      <div class="tool-meta-v">Patchell et al. Lancet 2005 / NICE MSCC guideline / cauda equina decompression consensus</div>
+    </div>
+  </div>
+</section>
 <main><div id="app"></div></main>
 <footer>
   <strong>⚠️ 免責聲明</strong>：本工具為臨床決策輔助，不取代個別病人臨床判斷。手術與類固醇決策須與神經外科 / 腫瘤科 / 放腫科共同評估。<br>
