@@ -33,6 +33,10 @@ main{max-width:880px;margin:0 auto;padding:20px 18px 100px;}
 .score-range{font-size:12pt;color:var(--muted);margin-top:3px;}
 .score-reset{padding:8px 14px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:12.6pt;}
 .score-reset:hover{border-color:var(--muted);color:var(--text);}
+.score-copy{padding:8px 14px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-size:11.5pt;}
+.score-copy:hover{border-color:var(--ora);color:var(--ora);}
+#bt-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);background:rgba(13,17,23,.96);border:1px solid var(--border);color:var(--text);padding:11px 18px;border-radius:10px;font-size:11.5pt;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center;}
+#bt-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .intro{font-size:13.8pt;color:var(--muted);line-height:1.65;margin-bottom:16px;background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:14px 18px;}
 .intro b{color:var(--text);}
 
@@ -119,6 +123,7 @@ footer .subscribe-link:hover{background:rgba(255,123,46,.1);color:#ff9b5e}
       <div class="score-sev" id="sev">點選出現早期缺血變化的區域</div>
       <div class="score-range" id="cnt">受影響區域：0</div>
     </div>
+    <button class="score-copy" onclick="copySummary()">⧉ 複製摘要</button>
     <button class="score-reset" onclick="resetAll()">↺ 清除</button>
   </div>
 
@@ -200,6 +205,34 @@ function update(){
   sev.textContent=label;sev.style.color=color;num.style.color=color;
 }
 function resetAll(){for(const k in hit)delete hit[k];update();}
+function copySummary(){
+  const affected=HOTS.filter(h=>hit[h.c]).map(h=>h.c);
+  const n=affected.length,score=10-n;
+  const label=document.getElementById('sev').textContent;
+  const regions=n?affected.join('、'):'無';
+  const txt=`ASPECTS ${score} / 10 分（受影響區域 ${n} 個：${regions}）
+分層：${label}
+※ 本摘要由 BrainTaiwan ER 互動工具自行計算，供臨床教學與溝通參考；非病歷、診斷或醫療指令。ASPECTS 須由受訓醫師依標準影像判讀，治療決策應整合臨床、灌流影像與時間窗。`;
+  doCopy(txt);
+}
+function doCopy(txt){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast('已複製摘要到剪貼簿')).catch(()=>fallbackCopy(txt));
+  } else { fallbackCopy(txt); }
+}
+function fallbackCopy(txt){
+  const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');toast('已複製摘要到剪貼簿');}catch(e){toast('複製失敗，請手動選取');}
+  document.body.removeChild(ta);
+}
+let _toastT;
+function toast(msg){
+  let t=document.getElementById('bt-toast');
+  if(!t){t=document.createElement('div');t.id='bt-toast';document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(_toastT);_toastT=setTimeout(()=>t.classList.remove('show'),2200);
+}
 build();update();
 </script>
 </body>
