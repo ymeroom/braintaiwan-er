@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>格林-巴利症候群 · 急性處置決策 — BrainTaiwan ER</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0d1117;
+  --surf:     #161b22;
+  --surf2:    #21262d;
+  --border:   #30363d;
+  --text:     #e6edf3;
+  --muted:    #8b949e;
+  --red:      #f85149;
+  --red-dim:  #3d1515;
+  --blue:     #58a6ff;
+  --blue-dim: #0d2137;
+  --green:    #3fb950;
+  --grn-dim:  #0d2e0d;
+  --ylw:      #d29922;
+  --ylw-dim:  #2e2000;
+  --ora:      #ff7b2e;
+  --pur:      #bc8cff;
+  --pur-dim:  #1c1030;
+}
+
+body {
+  font-family: 'Segoe UI','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(135deg,#1a0530 0%,#231042 55%,#2d1458 100%);
+  border-bottom: 1px solid #3a1c66; padding: 18px 24px;
+}
+.header-inner { max-width: 800px; margin: 0 auto; }
+.brand { font-size: 11pt; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+.tool-title { font-size: 22pt; font-weight: 700; color: white; line-height: 1.2; }
+.tool-sub { font-size: 12pt; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+.topnav { background: var(--surf); border-bottom: 1px solid var(--border); padding: 10px 24px; }
+.topnav-inner { max-width: 800px; margin: 0 auto; display: flex; gap: 6px; align-items: center; }
+.topnav a { color: var(--muted); text-decoration: none; font-size: 11.5pt; padding: 5px 12px; border-radius: 6px; transition: background 0.15s; }
+.topnav a:hover { background: var(--surf2); color: var(--text); }
+.topnav .cur { color: var(--pur); font-weight: 600; }
+
+main { max-width: 800px; margin: 0 auto; padding: 28px 20px 72px; }
+
+/* ── PHASE INDICATOR ── */
+.phase-bar {
+  display: flex; gap: 0; border-radius: 8px; overflow: hidden;
+  margin-bottom: 22px; border: 1px solid var(--border);
+}
+.phase-seg {
+  flex: 1; padding: 10px 6px; text-align: center;
+  font-size: 11pt; color: var(--muted); background: var(--surf);
+  border-right: 1px solid var(--border); line-height: 1.3;
+}
+.phase-seg:last-child { border-right: none; }
+.phase-seg.act { color: white; font-weight: 700; }
+.ph-0.act { background: #16324d; color: var(--blue); }
+.ph-1.act { background: #0d3a33; color: #3fb9ad; }
+.ph-2.act { background: #4a3800; color: var(--ylw); }
+.ph-3.act { background: #2a0a40; color: var(--pur); }
+.ph-4.act { background: #1b4d1b; color: var(--green); }
+.phase-seg .ph-time { font-size: 9pt; opacity: 0.75; }
+
+/* ── BREADCRUMB ── */
+.crumb { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.crumb-item {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 12px; font-size: 11pt;
+  display: flex; gap: 6px; align-items: center;
+}
+.crumb-lbl { color: var(--muted); }
+.crumb-val { color: var(--text); font-weight: 600; }
+
+/* ── STEP CARD ── */
+.step-card {
+  background: var(--surf); border: 1px solid var(--border);
+  border-radius: 12px; padding: 26px 28px 22px;
+}
+.step-meta { display: flex; align-items: center; gap: 10px; font-size: 11pt; color: var(--muted); margin-bottom: 10px; }
+.step-dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--pur); color: #0d1117; font-size: 11pt; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-q { font-size: 17pt; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 8px; }
+.step-hint { font-size: 12pt; color: var(--muted); line-height: 1.55; margin-bottom: 20px; }
+
+/* ── DRUG INLINE BOX ── */
+.dose-inline {
+  background: rgba(0,0,0,0.35); border-radius: 8px; padding: 14px 16px; margin: 12px 0;
+  font-size: 12pt; color: var(--text); line-height: 1.6;
+}
+.dose-inline strong { color: var(--pur); }
+
+/* ── OPTIONS ── */
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.opt-btn {
+  background: var(--surf2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px 20px;
+  text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.opt-btn:hover { border-color: var(--pur); background: #160e22; }
+.opt-main { font-size: 14pt; font-weight: 600; color: var(--text); }
+.opt-sub  { font-size: 11.5pt; color: var(--muted); }
+
+/* ── DRUG CHOICE BUTTONS ── */
+.drug-opts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.drug-opt {
+  background: var(--surf2); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; cursor: pointer;
+  transition: border-color 0.15s; text-align: left;
+}
+.drug-opt:hover { border-color: var(--blue); }
+.drug-opt-name { font-size: 14pt; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+.drug-opt-dose { font-size: 15pt; font-weight: 700; color: white; }
+.drug-opt-note { font-size: 11.5pt; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+
+/* ── NAV BUTTONS ── */
+.nav-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-btn {
+  padding: 10px 18px; background: var(--surf2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--muted); cursor: pointer; font-size: 12pt; transition: all 0.15s;
+}
+.nav-btn:hover { border-color: var(--muted); color: var(--text); }
+
+/* ── RESULT CARD ── */
+.res-card { border-radius: 12px; padding: 28px; }
+.res-card.green  { background: var(--grn-dim); border: 1px solid #1a5c1a; }
+.res-card.blue   { background: var(--blue-dim); border: 1px solid #1a3d60; }
+.res-card.yellow { background: var(--ylw-dim);  border: 1px solid #4a3800; }
+.res-card.red    { background: var(--red-dim);  border: 1px solid #5a2020; }
+.res-card.purple { background: var(--pur-dim);  border: 1px solid #3a1860; }
+.res-card.gray   { background: var(--surf);     border: 1px solid var(--border); }
+
+.res-badge {
+  display: inline-block; font-size: 11pt; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+}
+.green .res-badge  { background: #174d17; color: var(--green); }
+.blue  .res-badge  { background: #0a2845; color: var(--blue); }
+.yellow .res-badge { background: #3a2800; color: var(--ylw); }
+.red   .res-badge  { background: #4a1515; color: var(--red); }
+.purple .res-badge { background: #200840; color: var(--pur); }
+.gray  .res-badge  { background: var(--surf2); color: var(--muted); }
+
+.res-title { font-size: 19pt; font-weight: 700; color: white; margin-bottom: 18px; line-height: 1.25; }
+
+.drug-box {
+  background: rgba(0,0,0,0.35); border-radius: 10px; padding: 16px 18px; margin: 12px 0;
+}
+.drug-name { font-size: 13pt; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.drug-name.alt { color: var(--blue); }
+.drug-name.red { color: var(--red); }
+.drug-dose { font-size: 17pt; font-weight: 700; color: white; }
+.drug-detail { font-size: 12pt; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+.act-list { list-style: none; margin: 10px 0; }
+.act-list li {
+  font-size: 13pt; color: var(--text); padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; gap: 10px; align-items: flex-start; line-height: 1.5;
+}
+.act-list li:last-child { border-bottom: none; }
+
+.warn-inline {
+  background: rgba(210,153,34,0.15); border: 1px solid rgba(210,153,34,0.3);
+  border-radius: 6px; padding: 12px 14px; font-size: 12.5pt; color: var(--ylw);
+  margin: 12px 0; line-height: 1.5;
+}
+.dont-inline {
+  background: rgba(248,81,73,0.12); border: 1px solid rgba(248,81,73,0.3);
+  border-radius: 6px; padding: 12px 14px; font-size: 12.5pt; color: #ff8a82;
+  margin: 12px 0; line-height: 1.55;
+}
+.dont-inline strong { color: var(--red); }
+.ref-box {
+  margin-top: 18px; padding: 12px 14px;
+  background: rgba(0,0,0,0.3); border-radius: 6px;
+  font-size: 11pt; color: var(--muted); line-height: 1.5;
+}
+
+footer {
+  background: var(--surf); border-top: 1px solid var(--border);
+  text-align: center; padding: 20px 24px;
+  font-size: 11pt; color: var(--muted); margin-top: 40px; line-height: 1.7;
+}
+footer a { color: var(--muted); text-decoration: none; }
+
+@media(max-width:600px) {
+  .step-q { font-size: 15pt; }
+  .res-title { font-size: 16pt; }
+  .step-card, .res-card { padding: 20px 16px; }
+  .phase-bar { display: none; }
+}
+.tool-meta{max-width:800px;margin:16px auto 0;padding:0 20px}
+.tool-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tool-meta-item{background:rgba(22,27,34,.92);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.tool-meta-k{font-size:9.5pt;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ora);margin-bottom:5px}
+.tool-meta-v{font-size:10.5pt;line-height:1.5;color:var(--muted)}
+@media(max-width:720px){.tool-meta-grid{grid-template-columns:1fr}.tool-meta{padding:0 18px}}
+footer .subscribe-link{display:inline-flex;align-items:center;justify-content:center;margin:10px 0 4px;padding:6px 12px;border-radius:18px;border:1px solid rgba(255,123,46,.45);color:var(--ora);text-decoration:none}
+footer .subscribe-link:hover{background:rgba(255,123,46,.1);color:#ff9b5e}
+</style>
+<link rel="canonical" href="https://er.braintaiwan.com/gbs.html">
+<meta property="og:url" content="https://er.braintaiwan.com/gbs.html">
+<meta property="og:image" content="https://er.braintaiwan.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://er.braintaiwan.com/og.png">
+<meta name="description" content="格林-巴利症候群（GBS）· 急性處置決策輔助 · EAN/PNS 2023 指引：診斷三條件、mEGRIS 呼吸風險、IVIg／血漿置換治療門檻與監測。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="格林-巴利症候群 · 急性處置決策 — BrainTaiwan ER">
+<meta property="og:description" content="GBS 急性處置決策輔助 · EAN/PNS 2023 指引 · 診斷／mEGRIS／IVIg・PE">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">BrainTaiwan · ER</div>
+    <div class="tool-title">格林-巴利症候群（GBS）</div>
+    <div class="tool-sub">Guillain–Barré Syndrome · 急性處置決策輔助 · EAN/PNS 2023 Guideline</div>
+  </div>
+</header>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="/">首頁</a>
+    <span style="color:var(--border)">›</span>
+    <a href="gbs.html" class="cur">格林-巴利症候群</a>
+  </div>
+</nav>
+
+<!-- bt-tool-meta -->
+<section class="tool-meta" aria-label="工具版本與資料來源">
+  <div class="tool-meta-grid">
+    <div class="tool-meta-item">
+      <div class="tool-meta-k">適用對象</div>
+      <div class="tool-meta-v">急診、神經科與加護病房團隊；用於疑似 GBS 的診斷、呼吸風險分層與免疫治療決策。</div>
+    </div>
+    <div class="tool-meta-item">
+      <div class="tool-meta-k">最後更新</div>
+      <div class="tool-meta-v">2026.06</div>
+    </div>
+    <div class="tool-meta-item">
+      <div class="tool-meta-k">資料來源</div>
+      <div class="tool-meta-v">EAN/PNS Guideline on GBS · van Doorn et al. Eur J Neurol 2023;30:3646–3674</div>
+    </div>
+  </div>
+</section>
+<main>
+  <div id="app"></div>
+</main>
+
+<footer>
+  <strong>⚠️ 免責聲明</strong>：本工具為臨床決策輔助，不取代個別病人臨床判斷。所有治療決定須依醫師評估執行。<br>
+  資料來源：van Doorn PA, Van den Bergh PYK, Hadden RDM, et al. EAN/PNS Guideline on diagnosis and treatment of Guillain–Barré syndrome. <em>Eur J Neurol</em> 2023;30:3646–3674<br>
+  📖 延伸閱讀：<a href="https://md.braintaiwan.com/gbs01.html">MD 格林-巴利症候群系列導讀（gbs01–05）</a><br>
+  © 2026 BrainTaiwan ER · <a href="https://braintaiwan.com">braintaiwan.com</a>
+  <a class="subscribe-link" href="https://media.braintaiwan.com/subscribe.html">訂閱 ER 工具更新</a><br>
+</footer>
+
+<script>
+// ── PHASE BAR LABELS ──
+const PHASES = [
+  { label: '診斷',     time: '三條件',   cls: 'ph-0' },
+  { label: '輔助檢查', time: 'CSF/NCS',  cls: 'ph-1' },
+  { label: '呼吸風險', time: 'mEGRIS',   cls: 'ph-2' },
+  { label: '免疫治療', time: 'IVIg/PE',  cls: 'ph-3' },
+  { label: '監測預後', time: 'mEGOS',    cls: 'ph-4' },
+];
+
+// ── STEPS ──
+const STEPS = {
+
+  dx: {
+    num: 1, title: 'STEP 1', phase: 0,
+    q: '臨床圖像符合 GBS 嗎？',
+    hint: 'EAN/PNS 診斷三必要條件（Table 1）：① 手腳進行性無力 ② 患肢深部肌腱反射消失或減弱 ③ 進展不超過 4 週。先確認核心，再排除模仿者。',
+    opts: [
+      { main: '符合三條件：進行性無力 ＋ 反射↓/消失 ＋ 進展 ≤4 週', sub: '可從腿開始；多數 2 週內到頂', val: 'typical' },
+      { main: '出現不利線索（紅旗）', sub: '明顯持續不對稱／感覺平面／一開始就發燒／呼吸重而肢體只輕度無力／純感覺起病', val: 'redflag' },
+    ],
+    next: { typical: 'ancillary', redflag: 'result_mimic' }
+  },
+
+  ancillary: {
+    num: 2, title: 'STEP 2', phase: 1,
+    q: '輔助檢查：支持診斷，但別為了分亞型而等',
+    hint: '以下檢查用來「坐實診斷、排除模仿者」，不影響免疫治療時機。陰性或正常都不能排除 GBS——臨床仍像 GBS 就照流程走。',
+    chk: [
+      'CSF：蛋白-細胞分離是支持線索（非必要）。發病第一週蛋白可正常（約一半），一週後約 84% 升高',
+      'CSF 白血球 > 50×10⁶/L → 跳出來懷疑感染、淋巴瘤或 HIV 等別的病',
+      '電生理（NCS）：支持診斷；第一週可能正常，正常不排除；不必為了分亞型而做',
+      '疑 Miller Fisher（眼肌麻痺＋共濟失調＋反射消失）→ 驗 anti-GQ1b（敏感度 88–100%）',
+      '臨床不典型時：全脊椎含對比 MRI 排除脊髓壓迫／橫貫性脊髓炎',
+    ],
+    opts: [
+      { main: '完成初步評估 → 進入呼吸衰竭風險分層', val: 'resp' },
+    ],
+    next: { resp: 'resp' }
+  },
+
+  resp: {
+    num: 3, title: 'STEP 3', phase: 2,
+    q: '呼吸衰竭／重症風險分層（mEGRIS）',
+    hint: 'GBS 可在數小時到數天惡化到呼吸衰竭。入院當下就用 mEGRIS（發病到入院時間短、延髓麻痺、頸屈肌無力、髖屈肌無力；預測機械通氣 AUC 0.84）量化風險——連看起來只是手腳麻的輕症也要算。',
+    opts: [
+      { main: '有 ≥1 高風險特徵', sub: '發病→入院 <7 天｜延髓麻痺／吞嚥困難｜無法咳嗽｜頸屈或髖屈無力｜MRC 總分 <20/60｜FVC 已下降', val: 'high' },
+      { main: '目前無高風險特徵，呼吸穩定', sub: '仍需定期床邊監測 FVC／單口呼吸數', val: 'low' },
+    ],
+    next: { high: 'result_icu', low: 'gbsds' }
+  },
+
+  gbsds: {
+    num: 4, title: 'STEP 4', phase: 3,
+    q: '治療門檻：能不能自己走 10 公尺？',
+    hint: '用 GBS 失能分數（GBS-DS，0–6）畫分水嶺。3 分＝走 10 公尺要有人扶＝「無法獨走」，是幾乎所有試驗的治療門檻。但別只看當下——把「掉得多快」和「壞預後因子」一起判斷。',
+    opts: [
+      { main: '不能獨走（GBS-DS ≥ 3）', sub: '走 10 公尺需人扶／臥床／需呼吸器', val: 'severe' },
+      { main: '還能走，但快速惡化或帶風險', sub: '進展快／吞嚥或呼吸風險／明顯壞預後因子 → 提早出手攔截', val: 'borderline' },
+      { main: '輕症且穩定', sub: 'GBS-DS 1（2 週內穩定）或 GBS-DS 1–2（發病第 2–4 週）', val: 'mild' },
+    ],
+    next: { severe: 'tx_choice', borderline: 'tx_choice', mild: 'result_mild' }
+  },
+
+  tx_choice: {
+    num: 5, title: 'STEP 5', phase: 3,
+    q: '選擇免疫治療：IVIg 或 血漿置換（兩者等效）',
+    hint: '兩種有效療法療效相當，指引無偏好——依可近性、靜脈通路與病人狀況選一種。重點是「盡早開始」，不要兩種合用。',
+    isDrug: true,
+    drugs: [
+      {
+        name: '▶ IVIg（多數情境首選）',
+        dose: '0.4 g/kg/day × 5 天',
+        note: '發病 2 週內盡早開始 ｜ 較少中途停藥、多數醫院隨手可得 ｜ 兒童常優先選 ｜ 注意血栓栓塞、無菌性腦膜炎、腎功能',
+        val: 'result_treated'
+      },
+      {
+        name: '▶ 血漿置換 PE（等效替代）',
+        dose: '總量 12–15 L，分 4–5 次／1–2 週',
+        note: '發病 4 週內盡早做、第一週內最有效 ｜ 需專門設備與良好靜脈通路 ｜ 自律神經不穩者用連續流機器較安全',
+        val: 'result_treated'
+      },
+    ],
+    next: { result_treated: 'result_treated' }
+  },
+};
+
+// ── RESULTS ──
+const RESULTS = {
+
+  result_mimic: {
+    type: 'yellow', badge: '⚠️ 先查模仿者',
+    title: '出現紅旗——先排除 GBS 模仿者',
+    phase: 0,
+    html: `
+      <p style="font-size:14pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">這些線索讓 GBS 變得不太可能（但非絕對排除）。在貼上 GBS 標籤前，先把該排除的排掉。</p>
+      <ul class="act-list">
+        <li><span>🧲</span><strong>感覺平面</strong>／明顯持續不對稱／一開始就大小便失禁 → 全脊椎 MRI 排除<strong>脊髓壓迫或橫貫性脊髓炎</strong></li>
+        <li><span>🌡️</span>發燒、CSF 白血球 > 50×10⁶/L → 查<strong>感染／腫瘤浸潤／HIV、萊姆病、西尼羅病毒</strong></li>
+        <li><span>💉</span>對稱近端無力＋呼吸快垮但反射保留 → 想<strong>肉毒桿菌、重症肌無力、低血鉀、卟啉症、白喉</strong></li>
+        <li><span>🧪</span>急性無力＋心律不整 → 查<strong>電解質（鉀）、毒物</strong></li>
+        <li><span>🔁</span>仍高度懷疑 GBS：模仿者排除後即回到診斷流程，別因單一檢查正常就放手</li>
+      </ul>
+      <div class="warn-inline">⚠️ 不利線索是「降低機率」不是「一票否決」。臨床整體仍像 GBS 時，輔助檢查正常不該阻止你治療。</div>
+      <div class="ref-box">EAN/PNS 2023 · Classification & diagnostic criteria（Table 1，支持／不利特徵）</div>`
+  },
+
+  result_icu: {
+    type: 'red', badge: '🔴 高呼吸風險',
+    title: '高風險——轉 ICU、量化監測，並同步啟動免疫治療',
+    phase: 2,
+    html: `
+      <p style="font-size:14pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">提早把高風險病人轉進 ICU，最大的好處是呼吸真的塌下來那一刻，呼吸器已在床邊——而不是手忙腳亂緊急插管。這類病人幾乎都已達治療門檻，免疫治療不要等。</p>
+
+      <ul class="act-list" style="margin-bottom:14px;">
+        <li><span>🏥</span>轉入 ICU／高度監護；備妥氣道與呼吸器</li>
+        <li><span>🫁</span><strong>FVC</strong>：一天 3–6 次，惡化時每 4 小時。跌 >30% 警覺；24 h 內跌 >50% 多半要插管；<strong>&lt;20 mL/kg</strong> 考慮選擇性（電擇期）插管；10 mL/kg 幾乎必然通氣</li>
+        <li><span>🗣️</span>無儀器：請病人吸一口氣數數，<strong>單口呼吸數 SBC &lt;20</strong> 即警訊；MIP&lt;40 或 MEP&lt;30 cmH₂O 應盡快考慮通氣</li>
+        <li><span>💓</span>自律神經不穩（血壓心率劇烈波動）同步監測心電圖；不穩者用<strong>連續流</strong>機器較安全</li>
+      </ul>
+
+      <div class="drug-box">
+        <div class="drug-name">▶ IVIg</div>
+        <div class="drug-dose">0.4 g/kg/day × 5 天</div>
+        <div class="drug-detail">不能獨走（GBS-DS ≥3）或快速惡化即啟動；與 PE 等效、無偏好</div>
+      </div>
+      <div class="drug-box">
+        <div class="drug-name alt">▶ 血漿置換 PE（等效）</div>
+        <div class="drug-dose">總量 12–15 L，4–5 次／1–2 週</div>
+        <div class="drug-detail">第一週內最有效；自律神經不穩者用連續流</div>
+      </div>
+
+      <div class="warn-inline">⚠️ 經典 722 人系列：六項預測因子中只要中 4 項（含「無法咳嗽」OR 9.09），約 <strong>85%</strong> 最終需要插管。</div>
+      <div class="dont-inline">🚫 <strong>別做</strong>：PE 後馬上接 IVIg（無增效）｜預後差就加打第二劑 IVIg（SID-GBS 無益、血栓更多）｜口服／靜脈類固醇。</div>
+      <div class="warn-inline" style="background:rgba(248,81,73,0.12);border-color:rgba(248,81,73,0.3);color:#ff8a82;">🩺 反直覺警語：<strong>三分之二的 GBS 死亡發生在病人從 ICU 轉出之後</strong>，多為遲發呼吸或心血管併發症。轉出 ICU 不是終點線。</div>
+      <div class="ref-box">EAN/PNS 2023 · PICO 7（ICU 監測）, Figure 2 ／ PICO 8–9（PE、IVIg）</div>`
+  },
+
+  result_mild: {
+    type: 'green', badge: '🟢 輕症穩定',
+    title: '輕症且穩定——可不起治，但密切觀察',
+    phase: 3,
+    html: `
+      <p style="font-size:14pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">在 GBS 最多 4 週的進展窗內，這群人再惡化到更高失能等級的機會很低，而免疫治療有副作用、又貴——指引明確說可以不起治。但「穩定」是動態的，要持續盯。</p>
+      <ul class="act-list">
+        <li><span>🟢</span>不起治的範圍：<strong>GBS-DS 1</strong>（很輕、還能跑）發病 2 週內穩定者；<strong>GBS-DS 1–2</strong> 在發病第 2–4 週者</li>
+        <li><span>🫁</span>仍要定期床邊監測：FVC／單口呼吸數、吞嚥與咳嗽力</li>
+        <li><span>📈</span>一旦惡化（掉到無法獨走、或快速進展）→ 立即回到治療門檻、啟動 IVIg 或 PE</li>
+        <li><span>🩹</span>同步處理疼痛、預防靜脈血栓與壓瘡，早期復健</li>
+      </ul>
+      <div class="warn-inline">⚠️ 別把「現在很輕」當成「之後也會輕」。GBS 的危險在速度——掉得快的人，輕症只是還沒到谷底。</div>
+      <div class="ref-box">EAN/PNS 2023 · 治療門檻（GBS-DS 與起治建議）</div>`
+  },
+
+  result_treated: {
+    type: 'blue', badge: '✅ 已啟動免疫治療',
+    title: '免疫治療已開始——監測、避開「別做」、早估預後',
+    phase: 4,
+    html: `
+      <p style="font-size:14pt;color:#e6edf3;line-height:1.6;margin-bottom:14px;">IVIg 或 PE 擇一、盡早給。接下來決定病人能不能回到原本生活的，是監測、止痛與復健這場長期戰。</p>
+
+      <ul class="act-list" style="margin-bottom:6px;">
+        <li><span>🫁</span>持續呼吸監測：FVC 跌 >30% 警覺、24 h 跌 >50% 準備插管、&lt;20 mL/kg 考慮選擇性插管；SBC &lt;20 警訊</li>
+        <li><span>💓</span>監測自律神經（血壓心率波動、心律），不穩者治療用連續流機器</li>
+        <li><span>📊</span>早估預後：<strong>mEGOS</strong>（發病當下與第 7 天）估 4–26 週「無法獨走」風險；壞預後＝年齡大、前驅腹瀉、入院高失能、低 MRC、<strong>遠端 CMAP 振幅 &lt;20% 正常下限</strong></li>
+        <li><span>💊</span>疼痛（可先於無力、痛得很真）：先 gabapentinoid／三環，再 carbamazepine；自律失調者用三環要小心；反對高劑量類固醇治痛</li>
+        <li><span>🛌</span>疲憊是 38–86% 的殘留、無特效藥（反對 amantadine）；復健（PT/OT/語言）<strong>急性期住院就開始</strong>，可持續 >6 個月</li>
+      </ul>
+
+      <div class="dont-inline">🚫 <strong>指引明確反對</strong>：口服類固醇（可能延遲恢復、有害）｜靜脈 methylprednisolone（無效）｜PE 後接 IVIg（無增效）｜預後差加打第二劑 IVIg（SID-GBS 無益、血栓栓塞更多）｜eculizumab（phase 2 未達主要終點）｜免疫吸附 IA。</div>
+
+      <div class="warn-inline">⚠️ 治療後仍可能惡化或出現治療相關波動（TRF）。若惡化超過 8 週、或 ≥3 次 TRF → 回頭懷疑<strong>急性起病 CIDP（A-CIDP，約佔 5%）</strong>，治療方向不同。</div>
+      <div class="ref-box">EAN/PNS 2023 · PICO 8–14（治療、預後、疼痛、疲憊）／延伸：<a href="https://md.braintaiwan.com/gbs04.html" style="color:#8b949e;">MD gbs04 治療</a>、<a href="https://md.braintaiwan.com/gbs05.html" style="color:#8b949e;">gbs05 預後</a></div>`
+  },
+};
+
+// ── STATE ──
+let path = [];
+let cur  = 'dx';
+
+const STEP_LABELS = {
+  dx: '診斷', ancillary: '輔助檢查', resp: '呼吸風險',
+  gbsds: '治療門檻', tx_choice: '免疫治療',
+};
+
+function getOptLabel(sid, val) {
+  const s = STEPS[sid]; if (!s) return val;
+  if (s.isDrug) {
+    const d = s.drugs.find(x => x.val === val);
+    return d ? d.name.replace('▶ ', '').split('（')[0] : val;
+  }
+  const o = s.opts && s.opts.find(x => x.val === val);
+  return o ? o.main : val;
+}
+
+function getPhase(stepId) {
+  if (stepId.startsWith('result_')) {
+    const r = RESULTS[stepId]; return r ? (r.phase ?? 0) : 0;
+  }
+  const s = STEPS[stepId]; return s ? (s.phase ?? 0) : 0;
+}
+
+function renderPhaseBar(activePhase) {
+  return '<div class="phase-bar">' +
+    PHASES.map((p, i) =>
+      `<div class="phase-seg ${p.cls}${i === activePhase ? ' act' : ''}">
+        ${p.label}<br><span class="ph-time">${p.time}</span>
+      </div>`
+    ).join('') +
+  '</div>';
+}
+
+function renderCrumbs() {
+  if (!path.length) return '';
+  return '<div class="crumb">' +
+    path.map(p =>
+      `<div class="crumb-item">
+        <span class="crumb-lbl">${STEP_LABELS[p.s] || p.s}</span>
+        <span style="color:#555;margin:0 3px">›</span>
+        <span class="crumb-val">${getOptLabel(p.s, p.v)}</span>
+      </div>`
+    ).join('') +
+  '</div>';
+}
+
+function renderNavBtns() {
+  if (!path.length) return '';
+  return `<div class="nav-btns" style="margin-top:20px;">
+    <button class="nav-btn" onclick="goBack()">← 上一步</button>
+    <button class="nav-btn" onclick="reset()">↺ 重新開始</button>
+  </div>`;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (cur.startsWith('result_')) { renderResult(app); return; }
+
+  const step = STEPS[cur];
+  if (!step) { app.innerHTML = `<p style="color:red">Step not found: ${cur}</p>`; return; }
+
+  let h = renderPhaseBar(step.phase ?? 0);
+  h += renderCrumbs();
+  h += `<div class="step-card">`;
+  h += `<div class="step-meta"><div class="step-dot">${step.num}</div><span>${step.title}</span></div>`;
+  h += `<div class="step-q">${step.q}</div>`;
+  if (step.hint) h += `<div class="step-hint">${step.hint}</div>`;
+
+  if (step.chk) {
+    h += `<div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+      <ul style="list-style:none;">`;
+    step.chk.forEach(c => {
+      h += `<li style="font-size:12.5pt;color:#e6edf3;padding:5px 0 5px 22px;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;line-height:1.5;">
+        <span style="position:absolute;left:0;">☐</span>${c}</li>`;
+    });
+    h += `</ul></div>`;
+  }
+
+  if (step.isDrug) {
+    h += `<div class="drug-opts">`;
+    step.drugs.forEach(d => {
+      h += `<button class="drug-opt" onclick="choose('${cur}','${d.val}')">
+        <div class="drug-opt-name">${d.name}</div>
+        <div class="drug-opt-dose">${d.dose}</div>
+        <div class="drug-opt-note">${d.note}</div>
+      </button>`;
+    });
+    h += `</div>`;
+  } else if (step.opts) {
+    h += `<div class="options">`;
+    step.opts.forEach(o => {
+      h += `<button class="opt-btn" onclick="choose('${cur}','${o.val}')">
+        <span class="opt-main">${o.main}</span>
+        ${o.sub ? `<span class="opt-sub">${o.sub}</span>` : ''}
+      </button>`;
+    });
+    h += `</div>`;
+  }
+
+  h += renderNavBtns();
+  h += `</div>`;
+  app.innerHTML = h;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderResult(app) {
+  const r = RESULTS[cur];
+  if (!r) { app.innerHTML = `<p style="color:red">Result not found: ${cur}</p>`; return; }
+
+  let h = renderPhaseBar(r.phase ?? 0);
+  h += renderCrumbs();
+  h += `<div class="res-card ${r.type}">`;
+  h += `<div class="res-badge">${r.badge}</div>`;
+  h += `<div class="res-title">${r.title}</div>`;
+  h += r.html;
+  h += `</div>`;
+  h += renderNavBtns();
+  app.innerHTML = h;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function choose(stepId, val) {
+  path.push({ s: stepId, v: val });
+  const step = STEPS[stepId];
+  cur = step.next[val];
+  render();
+}
+
+function goBack() {
+  if (!path.length) return;
+  const last = path.pop();
+  cur = last.s;
+  render();
+}
+
+function reset() {
+  path = []; cur = 'dx'; render();
+}
+
+render();
+</script>
+</body>
+</html>
