@@ -131,6 +131,7 @@ footer .subscribe-link:hover{background:rgba(255,123,46,.1);color:#ff9b5e}
       <div class="score-range" id="prog">已完成 0 / 15 項</div>
     </div>
     <button class="score-copy" onclick="copySummary()">⧉ 複製摘要</button>
+    <button class="score-copy" onclick="shareSummary()">➦ 分享</button>
     <button class="score-reset" onclick="resetAll()">↺ 清除</button>
   </div>
   <div id="items"></div>
@@ -219,16 +220,21 @@ function update(){
   sev.style.color=color;num.style.color=color;
 }
 function resetAll(){for(const k in scores)delete scores[k];render();}
-function copySummary(){
+function summaryText(){
   let total=0,done=0,lines=[];
   ITEMS.forEach((it,i)=>{if(scores[i]!==undefined){total+=scores[i];done++;lines.push(`${it.no} ${it.name}：${scores[i]}`);}});
-  if(done===0){toast('尚未評分，無法複製');return;}
+  if(done===0){toast('尚未評分');return null;}
   const sevTxt=document.getElementById('sev').textContent;
-  const txt=`NIHSS 總分 ${total} 分　${sevTxt}（已完成 ${done} / 15 項）
+  return `NIHSS 總分 ${total} 分　${sevTxt}（已完成 ${done} / 15 項）
 ─ 評分明細 ─
 ${lines.join('\n')}
 ※ 本摘要由 BrainTaiwan ER 互動工具自行計算，供臨床教學與溝通參考；非病歷、診斷或醫療指令。分數須由受訓人員依標準施測，並以完整神經學評估為準。`;
-  doCopy(txt);
+}
+function copySummary(){const txt=summaryText();if(txt)doCopy(txt);}
+function shareSummary(){
+  const txt=summaryText();if(!txt)return;
+  if(navigator.share){navigator.share({title:'NIHSS 評分摘要',text:txt}).catch(e=>{if(e.name!=='AbortError')doCopy(txt);});}
+  else doCopy(txt);
 }
 function doCopy(txt){
   if(navigator.clipboard&&navigator.clipboard.writeText){

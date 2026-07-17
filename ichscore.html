@@ -134,6 +134,7 @@ footer .subscribe-link:hover{background:rgba(255,123,46,.1);color:#ff9b5e}
       <div class="score-range" id="prog">已完成 0 / 5 項</div>
     </div>
     <button class="score-copy" onclick="copySummary()">⧉ 複製摘要</button>
+    <button class="score-copy" onclick="shareSummary()">➦ 分享</button>
     <button class="score-reset" onclick="resetAll()">↺ 清除</button>
   </div>
   <div id="items"></div>
@@ -215,16 +216,21 @@ function update(){
   });
 }
 function resetAll(){for(const k in scores)delete scores[k];render();}
-function copySummary(){
+function summaryText(){
   let total=0,done=0,lines=[];
   ITEMS.forEach((it,i)=>{if(scores[i]!==undefined){total+=scores[i];done++;lines.push(`${it.no} ${it.name}：+${scores[i]}（${it.opts.find(o=>o[0]===scores[i])[1]}）`);}});
-  if(done===0){toast('尚未評分，無法複製');return;}
+  if(done===0){toast('尚未評分');return null;}
   const mortTxt=done===5?`，對應 30 天死亡率 ${MORT[total]}`:'（未完成，需 5 項）';
-  const txt=`ICH Score 總分 ${total} 分（已完成 ${done} / 5 項）${mortTxt}
+  return `ICH Score 總分 ${total} 分（已完成 ${done} / 5 項）${mortTxt}
 ─ 評分明細 ─
 ${lines.join('\n')}
 ※ 本摘要由 BrainTaiwan ER 互動工具自行計算，依 Hemphill 2001 ICH Score；供臨床教學與溝通參考，非病歷、診斷或醫療指令。死亡率為原始世代觀察值，不應單獨作為撤除維生治療依據。`;
-  doCopy(txt);
+}
+function copySummary(){const txt=summaryText();if(txt)doCopy(txt);}
+function shareSummary(){
+  const txt=summaryText();if(!txt)return;
+  if(navigator.share){navigator.share({title:'ICH Score 評分摘要',text:txt}).catch(e=>{if(e.name!=='AbortError')doCopy(txt);});}
+  else doCopy(txt);
 }
 function doCopy(txt){
   if(navigator.clipboard&&navigator.clipboard.writeText){
